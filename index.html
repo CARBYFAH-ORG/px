@@ -67,7 +67,7 @@
 
   .main{margin-left:250px;flex:1;display:flex;flex-direction:column;min-width:0}
   .topbar{height:64px;background:var(--card);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:14px;padding:0 26px;position:sticky;top:0;z-index:30}
-  .topbar .menu-btn{display:none;background:none;border:1px solid var(--border);border-radius:8px;padding:7px 9px;color:var(--text-dim)}
+  .topbar .menu-btn{display:inline-flex;align-items:center;background:none;border:1px solid var(--border);border-radius:8px;padding:7px 9px;color:var(--text-dim);font-size:1rem}
   .topbar h2{font-size:1.15rem;font-weight:700;letter-spacing:-.01em}
   .topbar .clock{margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:.78rem;color:var(--text-dim);background:var(--bg);padding:6px 12px;border-radius:8px}
   .content{flex:1;padding:28px 26px}
@@ -179,8 +179,12 @@
   .cat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px}
   .cat-grid .panel{margin:0}
   .cat-list{max-height:300px;overflow-y:auto}
-  .cat-item{display:flex;align-items:center;gap:10px;padding:9px 11px;border:1px solid var(--border);border-radius:9px;margin-bottom:7px;font-size:.9rem}
-  .cat-item span{flex:1;word-break:break-word}
+  .cat-item{display:flex;align-items:center;gap:10px;padding:9px 11px;border:1px solid var(--border);border-radius:9px;margin-bottom:7px;font-size:.9rem;flex-wrap:wrap}
+  .cat-item span{flex:1;min-width:90px;overflow-wrap:break-word;word-break:normal}
+  .ic-btn{width:32px;height:32px;border:1px solid var(--border);background:var(--card);border-radius:8px;display:grid;place-items:center;font-size:.9rem;color:var(--text-dim);padding:0;flex:none}
+  .ic-btn:hover{background:var(--soft)}
+  .ic-btn.danger{color:var(--red-text);border-color:#fca5a5}
+  .ic-btn.danger:hover{background:var(--red-soft)}
 
   /* ── TABLA (usuarios/auditoría) ── */
   .tbl-wrap{background:var(--card);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);overflow-x:auto}
@@ -212,7 +216,6 @@
     .sidebar{transform:translateX(-100%)}
     .sidebar.open{transform:translateX(0)}
     .main{margin-left:0}
-    .topbar .menu-btn{display:inline-flex}
     .grid2{grid-template-columns:1fr}
   }
   @media(max-width:640px){
@@ -223,6 +226,23 @@
     .stat{padding:14px 16px}.stat .n{font-size:1.4rem}
     .wall{grid-template-columns:1fr}
     .cat-grid{grid-template-columns:1fr}
+  }
+
+  /* ── Backdrop móvil + sidebar colapsable ── */
+  .backdrop{position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:35;display:none}
+  .backdrop.show{display:block}
+  @media(min-width:881px){
+    .backdrop{display:none!important}
+    body.sb-collapsed .sidebar{width:74px}
+    body.sb-collapsed .main{margin-left:74px}
+    body.sb-collapsed .sidebar .brand{justify-content:center;padding:18px 0}
+    body.sb-collapsed .sidebar .brand>div:last-child{display:none}
+    body.sb-collapsed .nav a{justify-content:center;gap:0;font-size:0;padding:11px 0}
+    body.sb-collapsed .nav a svg{width:21px;height:21px}
+    body.sb-collapsed .nav .grp{font-size:0;padding:9px 0}
+    body.sb-collapsed .sfoot .who,body.sb-collapsed .sfoot .rol{display:none}
+    body.sb-collapsed .btn-logout{justify-content:center;gap:0;font-size:0;padding:10px 0}
+    body.sb-collapsed .btn-logout svg{width:18px;height:18px}
   }
 </style>
 </head>
@@ -272,6 +292,8 @@
       <button class="btn-logout" id="btn-logout"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 12H3m12 0-4-4m4 4-4 4M9 4h7a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H9"/></svg>Cerrar sesión</button>
     </div>
   </aside>
+
+  <div class="backdrop" id="backdrop"></div>
 
   <div class="main">
     <div class="topbar">
@@ -536,6 +558,7 @@ function mostrarApp(){
   document.getElementById('login').classList.add('hidden');
   document.getElementById('app').classList.remove('hidden');
   document.body.className='role-'+S.rol;
+  if(store.get('px_sbcol')==='1') document.body.classList.add('sb-collapsed');
   document.getElementById('sb-nombre').textContent=S.nombre;
   document.getElementById('sb-rol').textContent=S.rol;
   reloj(); cargar();
@@ -550,6 +573,7 @@ function irA(v){
   document.getElementById('v-'+v).classList.add('active');
   document.getElementById('tb-title').textContent=titulos[v]||'';
   document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('backdrop').classList.remove('show');
   if(v==='dashboard')pintarDashboard();
   if(v==='perfiles')pintarMuro();
   if(v==='reportes')pintarReportes();
@@ -558,7 +582,14 @@ function irA(v){
   if(v==='auditoria')cargarAuditoria();
 }
 document.querySelectorAll('.nav a').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();irA(a.dataset.view);}));
-document.getElementById('menu-btn').addEventListener('click',()=>document.getElementById('sidebar').classList.toggle('open'));
+const _sb=document.getElementById('sidebar'), _bd=document.getElementById('backdrop');
+function sidebarMovil(open){ _sb.classList.toggle('open',open); _bd.classList.toggle('show',open); }
+function toggleSidebar(){
+  if(window.innerWidth<=880){ sidebarMovil(!_sb.classList.contains('open')); }
+  else { document.body.classList.toggle('sb-collapsed'); store.set('px_sbcol', document.body.classList.contains('sb-collapsed')?'1':'0'); }
+}
+document.getElementById('menu-btn').addEventListener('click',toggleSidebar);
+_bd.addEventListener('click',()=>sidebarMovil(false));
 
 /* ── CARGA ── */
 async function cargar(){
@@ -843,7 +874,7 @@ let catCtx={tipo:null,valor:null};
 function pintarCatalogos(){
   document.getElementById('cat-cont').innerHTML=CAT_DEFS.map(d=>{
     const t=d[0],lbl=d[1],items=CAT[t]||[];
-    const filas=items.length?items.map(v=>`<div class="cat-item"><span>${esc(v)}</span><div class="acts"><button class="btn btn-sm" onclick="catEdit('${t}','${esc(v)}')">Editar</button><button class="btn btn-sm btn-danger" onclick="catDel('${t}','${esc(v)}')">✕</button></div></div>`).join(''):'<div class="empty" style="padding:20px">Sin valores aún.</div>';
+    const filas=items.length?items.map(v=>`<div class="cat-item"><span>${esc(v)}</span><div class="acts"><button class="ic-btn" title="Editar" onclick="catEdit('${t}','${esc(v)}')">✎</button><button class="ic-btn danger" title="Quitar" onclick="catDel('${t}','${esc(v)}')">✕</button></div></div>`).join(''):'<div class="empty" style="padding:20px">Sin valores aún.</div>';
     return `<div class="panel"><div class="panel-h"><h3>${lbl}</h3><span style="margin-left:auto;color:var(--text-soft);font-size:.8rem">${items.length}</span></div><div class="panel-b">
       <div class="toolbar" style="margin-bottom:12px"><input id="catnew-${t}" placeholder="Agregar…" style="flex:1" onkeydown="if(event.key==='Enter')catAdd('${t}')"><button class="btn btn-primary" onclick="catAdd('${t}')">+</button></div>
       <div class="cat-list">${filas}</div></div></div>`;
