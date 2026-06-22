@@ -255,6 +255,7 @@
           <button class="btn only-admin" onclick="abrirEncabezado()">Editar encabezado</button>
           <div style="flex:1"></div>
           <button class="btn btn-primary" onclick="copiarParte()">⎘ Copiar mensaje</button>
+          <button class="btn" style="background:#25D366;border-color:#25D366;color:#fff" onclick="enviarWhatsApp()">Enviar por WhatsApp</button>
         </div>
         <div class="parte-box" id="parte-out">—</div>
       </section>
@@ -538,11 +539,14 @@ function armarParte(){
     const bySit={};
     gente.forEach(p=>{const s=p.situacion||'(Sin situación)';(bySit[s]=bySit[s]||[]).push(p);});
     const sits=Object.keys(bySit).sort((a,b)=>{const da=/disponible/i.test(a)?0:1,db=/disponible/i.test(b)?0:1;return da-db||a.localeCompare(b,'es');});
-    sits.forEach(s=>{ out+=s+'. '+pad(bySit[s].length)+'\n'; });
+    sits.forEach(s=>{ out+=s+' = '+pad(bySit[s].length)+'\n'; });
     out+='Total '+pad(gente.length)+'\n';
     sits.forEach(s=>{
       out+='\n*'+s+'*\n';
-      bySit[s].forEach(p=>{ out+=(p.grado?p.grado+' ':'')+p.nombre+detalleTxt(p)+'\n'; });
+      bySit[s].forEach((p,i)=>{
+        const grado=p.grado?p.grado+(p.arma?' de '+p.arma:''):(p.arma||'');
+        out+=(i+1)+'. '+(grado?grado+' ':'')+p.nombre+detalleTxt(p)+'\n';
+      });
     });
   });
   out+='\n*PARA UN TOTAL DE: '+pad(gran)+'*';
@@ -560,6 +564,11 @@ function copiaManual(txt){
   const ta=document.createElement('textarea');ta.value=txt;document.body.appendChild(ta);ta.select();
   try{document.execCommand('copy');toast('Mensaje copiado.','ok');}catch(e){toast('Copia manualmente desde el recuadro.','err');}
   document.body.removeChild(ta);
+}
+function enviarWhatsApp(){
+  if(!PERS.length){toast('No hay personal para generar el parte.','err');return;}
+  const txt=window._parteTxt||'';
+  window.open('https://wa.me/?text='+encodeURIComponent(txt),'_blank');
 }
 function abrirEncabezado(){document.getElementById('enc-txt').value=CONFIG.saludo||'';abrir('ov-enc');}
 document.getElementById('enc-save').addEventListener('click',async function(){
