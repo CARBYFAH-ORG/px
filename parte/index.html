@@ -350,7 +350,7 @@
 <div class="overlay" id="ov-cat">
   <div class="modal" style="max-width:420px">
     <div class="modal-h"><h3>Renombrar valor</h3><button class="modal-x" onclick="cerrar('ov-cat')">&times;</button></div>
-    <div class="modal-b"><div class="field"><label>Valor</label><input id="cat-input" autocomplete="off"></div></div>
+    <div class="modal-b"><div class="field"><label>Valor</label><input id="cat-input" autocomplete="off"></div><div class="field" id="cat-orden-wrap" style="display:none"><label>Jerarquía (1 = mayor grado)</label><input id="cat-orden" type="number" min="1"></div></div>
     <div class="modal-f"><button class="btn" onclick="cerrar('ov-cat')">Cancelar</button><button class="btn btn-primary" id="cat-save">Guardar</button></div>
   </div>
 </div>
@@ -412,7 +412,7 @@ const store={get:k=>{try{return localStorage.getItem(k)}catch(e){return _mem[k]|
 
 let S={token:store.get('parte_token'),rol:store.get('parte_rol'),nombre:store.get('parte_nombre'),usuario:store.get('parte_user')};
 let CATEGORIAS=['Oficiales','Suboficiales','Tropa','Auxiliares'];
-let PERS=[], CAT={}, CONFIG={}, ctxId=null;
+let PERS=[], CAT={}, CONFIG={}, GRADOORD={}, ctxId=null;
 
 async function api(params,method='GET'){
   if(method==='GET'){
@@ -499,7 +499,7 @@ async function cargar(){
   try{
     const res=await api({action:'datos',token:S.token});
     if(res.categorias)CATEGORIAS=res.categorias;
-    PERS=res.personal||[]; CAT=res.catalogos||{}; CONFIG=res.config||{};
+    PERS=res.personal||[]; CAT=res.catalogos||{}; CONFIG=res.config||{}; GRADOORD=res.gradoOrden||{};
     llenarSelects(); pintarFiltros(); armarParte(); pintarPersonal();
   }catch(e){ if(e.message!=='Sesión expirada') toast(e.message,'err'); }
 }
@@ -527,6 +527,12 @@ function detalleTxt(p){
   if(p.desde||p.hasta)d.push((p.desde||'')+(p.hasta?(p.desde?' al ':'hasta ')+p.hasta:''));
   return d.length?' ('+d.join(', ')+')':'';
 }
+function jerarquiaDe(p){
+  const t='grado_'+String(p.categoria||'').toLowerCase();
+  const m=GRADOORD[t]||{};
+  const o=m[p.grado];
+  return (o&&o>0)?o:9999; // sin jerarquía definida → al final
+}
 function armarParte(){
   const fecha=document.getElementById('parte-fecha').value||hoyISO();
   let out=(CONFIG.saludo||'Parte del día')+' *'+fechaMil(fecha)+'* \n';
@@ -543,6 +549,7 @@ function armarParte(){
     out+='Total '+pad(gente.length)+'\n';
     sits.forEach(s=>{
       out+='\n*'+s+'*\n';
+      bySit[s].sort((a,b)=>jerarquiaDe(a)-jerarquiaDe(b) || (a.nombre||'').localeCompare(b.nombre||'','es'));
       bySit[s].forEach((p,i)=>{
         const grado=p.grado?p.grado+(p.arma?' de '+p.arma:''):(p.arma||'');
         out+=(i+1)+'. '+(grado?grado+' ':'')+p.nombre+detalleTxt(p)+'\n';
@@ -690,25 +697,54 @@ let catCtx={tipo:null,valor:null};
 function pintarCatalogos(){
   document.getElementById('cat-cont').innerHTML=CAT_DEFS.map(d=>{
     const t=d[0],lbl=d[1],items=CAT[t]||[];
-    const filas=items.length?items.map(v=>`<div class="cat-item"><span>${esc(v)}</span><div class="acts"><button class="ic-btn" title="Editar" onclick="catEdit('${t}','${esc(v)}')">✎</button><button class="ic-btn danger" title="Quitar" onclick="catDel('${t}','${esc(v)}')">✕</button></div></div>`).join(''):'<div class="empty" style="padding:18px">Sin valores aún.</div>';
+    const esGrado=t.indexOf('grado_')===0;
+    const ord=(GRADOORD&&GRADOORD[t])||{};
+    const filas=items.length?items.map(v=>{
+      const badge=esGrado?`<span class="pill slate" style="margin-right:4px">#${ord[v]||'?'}</span>`:'';
+      return `<div class="cat-item">${badge}<span>${esc(v)}</span><div class="acts"><button class="ic-btn" title="Editar" onclick="catEdit('${t}','${esc(v)}')">✎</button><button class="ic-btn danger" title="Quitar" onclick="catDel('${t}','${esc(v)}')">✕</button></div></div>`;
+    }).join(''):'<div class="empty" style="padding:18px">Sin valores aún.</div>';
+    const addRow=esGrado
+      ? `<div class="toolbar" style="margin-bottom:12px;gap:6px"><input id="catnew-${t}" placeholder="Grado…" style="flex:1;min-width:0"><input id="catord-${t}" type="number" min="1" placeholder="Jerarquía" style="width:92px" onkeydown="if(event.key==='Enter')catAdd('${t}')"><button class="btn btn-primary" onclick="catAdd('${t}')">+</button></div>`
+      : `<div class="toolbar" style="margin-bottom:12px"><input id="catnew-${t}" placeholder="Agregar…" style="flex:1" onkeydown="if(event.key==='Enter')catAdd('${t}')"><button class="btn btn-primary" onclick="catAdd('${t}')">+</button></div>`;
+    const ayuda=esGrado?'<div style="font-size:.74rem;color:var(--text-soft);margin-bottom:8px">Jerarquía: 1 = mayor grado. No se puede repetir.</div>':'';
     return `<div class="panel"><div class="panel-h"><h3>${lbl}</h3><span style="margin-left:auto;color:var(--text-soft);font-size:.8rem">${items.length}</span></div><div class="panel-b">
-      <div class="toolbar" style="margin-bottom:12px"><input id="catnew-${t}" placeholder="Agregar…" style="flex:1" onkeydown="if(event.key==='Enter')catAdd('${t}')"><button class="btn btn-primary" onclick="catAdd('${t}')">+</button></div>
+      ${ayuda}${addRow}
       <div class="cat-list">${filas}</div></div></div>`;
   }).join('');
 }
 async function catAdd(tipo){
   const inp=document.getElementById('catnew-'+tipo),valor=inp.value.trim();
   if(!valor){toast('Escribe un valor.','err');return;}
-  try{const r=await api({action:'cat_crear',token:S.token,tipo,valor},'POST');if(!r.ok)throw new Error(r.error);
+  const params={action:'cat_crear',token:S.token,tipo,valor};
+  if(tipo.indexOf('grado_')===0){
+    const o=document.getElementById('catord-'+tipo); const orden=parseInt(o.value,10);
+    if(!orden||orden<1){toast('Indica la jerarquía (1 = mayor grado).','err');return;}
+    params.orden=orden;
+  }
+  try{const r=await api(params,'POST');if(!r.ok)throw new Error(r.error);
     inp.value='';toast('Agregado.','ok');await recargar();
   }catch(e){toast(e.message,'err');}
 }
-function catEdit(tipo,valor){catCtx={tipo,valor};document.getElementById('cat-input').value=valor;abrir('ov-cat');setTimeout(()=>document.getElementById('cat-input').focus(),50);}
+function catEdit(tipo,valor){
+  catCtx={tipo,valor};
+  const esGrado=tipo.indexOf('grado_')===0;
+  document.getElementById('cat-input').value=valor;
+  const wrap=document.getElementById('cat-orden-wrap');
+  if(esGrado){ wrap.style.display=''; document.getElementById('cat-orden').value=((GRADOORD&&GRADOORD[tipo]&&GRADOORD[tipo][valor])||''); }
+  else wrap.style.display='none';
+  abrir('ov-cat');setTimeout(()=>document.getElementById('cat-input').focus(),50);
+}
 document.getElementById('cat-save').addEventListener('click',async function(){
   const nuevo=document.getElementById('cat-input').value.trim();
   if(!nuevo){toast('No puede estar vacío.','err');return;}
+  const params={action:'cat_editar',token:S.token,tipo:catCtx.tipo,valor:catCtx.valor,nuevo};
+  if(catCtx.tipo.indexOf('grado_')===0){
+    const orden=parseInt(document.getElementById('cat-orden').value,10);
+    if(!orden||orden<1){toast('Indica la jerarquía (1 = mayor grado).','err');return;}
+    params.orden=orden;
+  }
   this.disabled=true;
-  try{const r=await api({action:'cat_editar',token:S.token,tipo:catCtx.tipo,valor:catCtx.valor,nuevo},'POST');if(!r.ok)throw new Error(r.error);
+  try{const r=await api(params,'POST');if(!r.ok)throw new Error(r.error);
     toast('Actualizado'+(r.actualizados?' ('+r.actualizados+')':'')+'.','ok');cerrar('ov-cat');await recargar();
   }catch(e){toast(e.message,'err');}finally{this.disabled=false;}
 });
@@ -718,7 +754,7 @@ async function catDel(tipo,valor){
   try{const r=await api({action:'cat_borrar',token:S.token,tipo,valor},'POST');if(!r.ok)throw new Error(r.error);toast('Quitado.','ok');await recargar();}
   catch(e){toast(e.message,'err');}
 }
-async function recargar(){try{const res=await api({action:'datos',token:S.token});PERS=res.personal||[];CAT=res.catalogos||{};CONFIG=res.config||{};llenarSelects();pintarFiltros();pintarCatalogos();pintarPersonal();armarParte();}catch(e){}}
+async function recargar(){try{const res=await api({action:'datos',token:S.token});PERS=res.personal||[];CAT=res.catalogos||{};CONFIG=res.config||{};GRADOORD=res.gradoOrden||{};llenarSelects();pintarFiltros();pintarCatalogos();pintarPersonal();armarParte();}catch(e){}}
 
 /* ── USUARIOS ── */
 async function cargarUsuarios(){
