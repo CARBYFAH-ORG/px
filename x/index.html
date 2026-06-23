@@ -141,11 +141,11 @@
   .detail-head .meta{flex:1;min-width:200px}
   .detail-head .meta h2{font-size:1.4rem;font-weight:700}
   .detail-head .meta .sub{color:var(--text-dim);font-size:.85rem;margin-top:2px;word-break:break-all}
-  .timeline{display:flex;align-items:flex-end;gap:8px;height:140px;padding:10px 0}
-  .tl-bar{flex:1;min-width:8px;background:var(--primary-soft);border-radius:6px 6px 0 0;position:relative;display:flex;flex-direction:column;justify-content:flex-end;align-items:center}
+  .timeline{display:flex;align-items:flex-end;justify-content:flex-start;gap:8px;height:140px;padding:10px 0}
+  .tl-bar{flex:1 1 0;min-width:10px;max-width:54px;background:var(--primary-soft);border-radius:6px 6px 0 0;position:relative;display:flex;flex-direction:column;justify-content:flex-end;align-items:center}
   .tl-bar .tf{width:100%;background:var(--primary);border-radius:6px 6px 0 0;transition:.3s}
-  .tl-x{display:flex;gap:8px;margin-top:4px}
-  .tl-x span{flex:1;text-align:center;font-size:.64rem;color:var(--text-soft);min-width:8px}
+  .tl-x{display:flex;gap:8px;margin-top:4px;justify-content:flex-start}
+  .tl-x span{flex:1 1 0;max-width:54px;min-width:10px;text-align:center;font-size:.64rem;color:var(--text-soft)}
   .row-item{display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)}
   .row-item:last-child{border-bottom:none}
   .row-item .ri-main{flex:1;min-width:0}
@@ -226,7 +226,16 @@
     .stat{padding:14px 16px}.stat .n{font-size:1.4rem}
     .wall{grid-template-columns:1fr}
     .cat-grid{grid-template-columns:1fr}
+    .detail-head .meta h2{font-size:1.2rem}
+    .detail-head .av{width:46px;height:46px;font-size:1.1rem}
+    .timeline{height:110px}
+    .row-item{flex-direction:column;gap:4px}
+    .row-item .ri-date{order:-1;font-size:.72rem}
+    .seg{gap:10px}
   }
+  /* enlaces y textos largos nunca desbordan */
+  .row-item a,.row-item .ri-main{overflow-wrap:anywhere;word-break:break-word;min-width:0}
+  .detail-head .meta .sub{overflow-wrap:anywhere}
 
   /* ── Backdrop móvil + sidebar colapsable ── */
   .backdrop{position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:35;display:none}
