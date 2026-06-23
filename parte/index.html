@@ -221,6 +221,7 @@
       <div class="grp">Principal</div>
       <a data-view="parte" class="active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11H6a2 2 0 0 0-2 2v6h16v-6a2 2 0 0 0-2-2h-3"/><rect x="9" y="3" width="6" height="8" rx="1"/></svg>Generar parte</a>
       <a data-view="personal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3.5"/><path d="M3 20a6 6 0 0 1 12 0"/><path d="M16 5.5a3 3 0 0 1 0 5.5M21 20a6 6 0 0 0-5-5.9"/></svg>Personal</a>
+      <a data-view="adt"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10 12 5 2 10l10 5 10-5z"/><path d="M6 12v5c0 1 2.7 2.5 6 2.5s6-1.5 6-2.5v-5"/></svg>Adiestramiento</a>
       <div class="grp only-admin">Administración</div>
       <a data-view="catalogos" class="only-admin"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h10"/><circle cx="19" cy="17" r="2"/></svg>Catálogos</a>
       <a data-view="usuarios" class="only-admin"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3.5"/><path d="M3 20a6 6 0 0 1 12 0"/></svg>Usuarios</a>
@@ -271,6 +272,19 @@
           <button class="btn btn-primary" onclick="abrirNuevo()">+ Nueva persona</button>
         </div>
         <div id="personal-cont"></div>
+      </section>
+
+      <!-- ADIESTRAMIENTO -->
+      <section class="view" id="v-adt">
+        <div class="page-title">Adiestramiento</div>
+        <div class="page-sub">Cursos y seminarios del personal (nivel FAH). Busca un curso para ver quiénes lo tienen.</div>
+        <div class="toolbar">
+          <input type="search" id="adt-bus" placeholder="Buscar persona o curso…">
+          <select id="adt-fil-cat"><option value="">Todas las categorías</option></select>
+          <button class="btn" onclick="exportarAdt()">⬇ Excel</button>
+          <button class="btn btn-primary" onclick="abrirNuevaPersonaAdt()">+ Persona</button>
+        </div>
+        <div id="adt-cont"></div>
       </section>
 
       <!-- CATÁLOGOS -->
@@ -346,6 +360,38 @@
   </div>
 </div>
 
+<!-- MODAL PERSONA ADIESTRAMIENTO -->
+<div class="overlay" id="ov-adtp">
+  <div class="modal">
+    <div class="modal-h"><h3 id="adtp-title">Nueva persona</h3><button class="modal-x" onclick="cerrar('ov-adtp')">&times;</button></div>
+    <div class="modal-b"><div class="grid2">
+      <div class="field"><label>Categoría</label><select id="ap-cat" onchange="cargarGradosDe('ap-cat','ap-grado')"></select></div>
+      <div class="field"><label>Grado</label><select id="ap-grado"></select></div>
+      <div class="field"><label>Arma</label><select id="ap-arma"></select></div>
+      <div class="field"><label>Unidad</label><input id="ap-unidad" autocomplete="off" placeholder="Ej. DEP. FA-2" list="dl-unidades"><datalist id="dl-unidades"></datalist></div>
+      <div class="field full"><label>Nombre completo *</label><input id="ap-nombre" autocomplete="off"></div>
+    </div></div>
+    <div class="modal-f"><button class="btn" onclick="cerrar('ov-adtp')">Cancelar</button><button class="btn btn-primary" id="adtp-save">Guardar</button></div>
+  </div>
+</div>
+
+<!-- MODAL CURSO -->
+<div class="overlay" id="ov-curso">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-h"><h3 id="curso-title">Agregar curso</h3><button class="modal-x" onclick="cerrar('ov-curso')">&times;</button></div>
+    <div class="modal-b">
+      <p id="curso-quien" style="color:var(--text-dim);font-size:.88rem;margin-bottom:14px"></p>
+      <div class="field"><label>Curso o seminario *</label><input id="k-curso" autocomplete="off" list="dl-cursos"><datalist id="dl-cursos"></datalist></div>
+      <div class="grid2">
+        <div class="field"><label>Año (opcional)</label><input id="k-anio" autocomplete="off" placeholder="Ej. 2012"></div>
+        <div class="field"><label>Lugar / Centro (opcional)</label><input id="k-lugar" autocomplete="off"></div>
+      </div>
+      <div class="field"><label>Observaciones (opcional)</label><textarea id="k-obs"></textarea></div>
+    </div>
+    <div class="modal-f"><button class="btn" onclick="cerrar('ov-curso')">Cancelar</button><button class="btn btn-primary" id="curso-save">Guardar</button></div>
+  </div>
+</div>
+
 <!-- MODAL CATÁLOGO -->
 <div class="overlay" id="ov-cat">
   <div class="modal" style="max-width:420px">
@@ -403,7 +449,7 @@
 
 <script>
 /* ════════ CONFIGURACIÓN ════════ */
-const API_URL = "https://script.google.com/macros/s/AKfycbztJ3X91vqBTsy-4VH_p8EfkMRxvQESuV1stIwX3YjhmmvPQor4-Ofuh4Ns5HAHZSoKSw/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbx5beQ5ufONbm1gWS4zX-iTUr1b8bd9cWDhWoUZVUVAs6-RWtj4KNKKoNmvZ9946IDZFQ/exec";
 /* ════════════════════════════════ */
 
 const MESES=['ENE','FEB','MAR','ABR','MAY','JUN','JUL','AGO','SEP','OCT','NOV','DIC'];
@@ -469,7 +515,7 @@ function mostrarApp(){
 }
 
 /* NAV + sidebar */
-const titulos={parte:'Generar parte',personal:'Personal',catalogos:'Catálogos',usuarios:'Usuarios',auditoria:'Auditoría',ayuda:'Ayuda'};
+const titulos={parte:'Generar parte',personal:'Personal',adt:'Adiestramiento',catalogos:'Catálogos',usuarios:'Usuarios',auditoria:'Auditoría',ayuda:'Ayuda'};
 function irA(v){
   document.querySelectorAll('.nav a').forEach(x=>x.classList.remove('active'));
   const link=document.querySelector('.nav a[data-view="'+v+'"]'); if(link)link.classList.add('active');
@@ -480,6 +526,7 @@ function irA(v){
   document.getElementById('backdrop').classList.remove('show');
   if(v==='parte')armarParte();
   if(v==='personal')pintarPersonal();
+  if(v==='adt')cargarAdt();
   if(v==='catalogos')pintarCatalogos();
   if(v==='usuarios')cargarUsuarios();
   if(v==='auditoria')cargarAuditoria();
@@ -756,6 +803,155 @@ async function catDel(tipo,valor){
   catch(e){toast(e.message,'err');}
 }
 async function recargar(){try{const res=await api({action:'datos',token:S.token});PERS=res.personal||[];CAT=res.catalogos||{};CONFIG=res.config||{};GRADOORD=res.gradoOrden||{};llenarSelects();pintarFiltros();pintarCatalogos();pintarPersonal();armarParte();}catch(e){}}
+
+/* ── ADIESTRAMIENTO ── */
+let ADP=[], ADC=[], adtPid=null, adtKid=null;
+async function cargarAdt(){
+  try{
+    const res=await api({action:'adt',token:S.token});
+    if(res.categorias)CATEGORIAS=res.categorias;
+    CAT=res.catalogos||CAT; GRADOORD=res.gradoOrden||GRADOORD;
+    ADP=res.personas||[]; ADC=res.cursos||[];
+    document.getElementById('adt-fil-cat').innerHTML='<option value="">Todas las categorías</option>'+CATEGORIAS.map(c=>`<option>${esc(c)}</option>`).join('');
+    // datalists
+    const cursos=[...new Set(ADC.map(c=>c.curso).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'es'));
+    document.getElementById('dl-cursos').innerHTML=cursos.map(c=>`<option value="${esc(c)}">`).join('');
+    const unidades=[...new Set(ADP.map(p=>p.unidad).filter(Boolean))].sort();
+    document.getElementById('dl-unidades').innerHTML=unidades.map(u=>`<option value="${esc(u)}">`).join('');
+    pintarAdt();
+  }catch(e){ if(e.message!=='Sesión expirada') toast(e.message,'err'); }
+}
+function cursosDe(pid){return ADC.filter(c=>c.personaId===pid);}
+function pintarAdt(){
+  const q=(document.getElementById('adt-bus').value||'').toLowerCase();
+  const fc=document.getElementById('adt-fil-cat').value;
+  let arr=ADP.filter(p=>{
+    if(fc&&p.categoria!==fc)return false;
+    if(q){
+      const enPersona=(p.nombre+' '+p.grado+' '+p.arma+' '+p.unidad).toLowerCase().indexOf(q)!==-1;
+      const enCurso=cursosDe(p.id).some(c=>(c.curso+' '+c.anio+' '+c.lugar).toLowerCase().indexOf(q)!==-1);
+      if(!enPersona&&!enCurso)return false;
+    }
+    return true;
+  });
+  const cont=document.getElementById('adt-cont');
+  if(!arr.length){cont.innerHTML='<div class="empty">No hay personal que coincida. Usa “+ Persona” para registrar.</div>';return;}
+  // si hay búsqueda por curso, resaltamos cuántos coinciden
+  let resumen='';
+  if(q){
+    const personasConCurso=arr.filter(p=>cursosDe(p.id).some(c=>(c.curso+' '+c.anio+' '+c.lugar).toLowerCase().indexOf(q)!==-1));
+    if(personasConCurso.length) resumen=`<div class="info-note" style="margin-bottom:14px"><b>${personasConCurso.length}</b> persona(s) con cursos que coinciden con "${esc(q)}".</div>`;
+  }
+  let html=resumen;
+  CATEGORIAS.concat(['']).forEach(cat=>{
+    const g=arr.filter(p=>(p.categoria||'')===cat);
+    if(!g.length)return;
+    g.sort((a,b)=>jerarquiaDe(a)-jerarquiaDe(b)||(a.nombre||'').localeCompare(b.nombre||'','es'));
+    html+=`<div class="cat-h">${esc(cat||'Sin categoría')} <span class="cnt">${g.length}</span></div>`;
+    html+=g.map(p=>{
+      const cs=cursosDe(p.id);
+      const cursosHtml=cs.length?cs.map(c=>`<div class="row-item"><div class="ri-main"><div class="nm" style="font-size:.9rem">${esc(c.curso)}</div>${c.lugar?`<div style="font-size:.82rem;color:var(--text-dim)">${esc(c.lugar)}</div>`:''}${c.observaciones?`<div style="font-size:.82rem;color:var(--text-dim);margin-top:2px">${esc(c.observaciones)}</div>`:''}</div><div style="display:flex;align-items:center;gap:6px"><span class="ri-date">${esc(c.anio||'')}</span><button class="ic-btn" title="Editar" onclick="abrirCursoEdit('${c.id}')">✎</button><button class="ic-btn danger" title="Borrar" onclick="borrarCurso('${c.id}')">✕</button></div></div>`).join(''):'<div style="color:var(--text-soft);font-size:.85rem;padding:6px 0">Sin cursos registrados.</div>';
+      return `<div class="panel" style="margin-bottom:12px"><div class="panel-h">
+        <div><h3 style="font-size:.98rem">${esc((p.grado?p.grado+(p.arma?' de '+p.arma:'')+' ':'')+p.nombre)}</h3><div style="font-size:.76rem;color:var(--text-soft);margin-top:2px">${esc(p.unidad||'—')} · ${cs.length} curso(s)</div></div>
+        <div class="acts" style="margin-left:auto"><button class="btn btn-sm btn-primary" onclick="abrirCursoNuevo('${p.id}')">+ Curso</button><button class="btn btn-sm" onclick="abrirPersonaAdtEdit('${p.id}')">Editar</button><button class="ic-btn danger only-admin" onclick="borrarPersonaAdt('${p.id}')" title="Borrar persona">✕</button></div>
+        </div><div class="panel-b">${cursosHtml}</div></div>`;
+    }).join('');
+  });
+  cont.innerHTML=html;
+}
+['adt-bus','adt-fil-cat'].forEach(id=>{const el=document.getElementById(id);if(el){el.addEventListener('input',pintarAdt);el.addEventListener('change',pintarAdt);}});
+
+function abrirNuevaPersonaAdt(){
+  adtPid=null;
+  document.getElementById('adtp-title').textContent='Nueva persona';
+  document.getElementById('ap-cat').innerHTML='<option value="">—</option>'+CATEGORIAS.map(c=>`<option>${esc(c)}</option>`).join('');
+  document.getElementById('ap-arma').innerHTML=optList(CAT.arma);
+  document.getElementById('ap-cat').value=''; cargarGradosDe('ap-cat','ap-grado');
+  ['ap-nombre','ap-unidad'].forEach(i=>document.getElementById(i).value='');
+  abrir('ov-adtp');
+}
+function abrirPersonaAdtEdit(id){
+  const p=ADP.find(x=>x.id===id); if(!p)return; adtPid=id;
+  document.getElementById('adtp-title').textContent='Editar persona';
+  document.getElementById('ap-cat').innerHTML='<option value="">—</option>'+CATEGORIAS.map(c=>`<option>${esc(c)}</option>`).join('');
+  document.getElementById('ap-cat').value=p.categoria||'';
+  cargarGradosDe('ap-cat','ap-grado',p.grado||'');
+  document.getElementById('ap-arma').innerHTML=optList(CAT.arma,p.arma);
+  document.getElementById('ap-nombre').value=p.nombre||'';
+  document.getElementById('ap-unidad').value=p.unidad||'';
+  abrir('ov-adtp');
+}
+document.getElementById('adtp-save').addEventListener('click',async function(){
+  const d={categoria:document.getElementById('ap-cat').value,grado:document.getElementById('ap-grado').value,
+    arma:document.getElementById('ap-arma').value,nombre:document.getElementById('ap-nombre').value.trim(),
+    unidad:document.getElementById('ap-unidad').value.trim()};
+  if(!d.nombre){toast('Escribe el nombre.','err');return;}
+  this.disabled=true;
+  try{const res=await api(Object.assign({action:adtPid?'adt_persona_editar':'adt_persona_crear',token:S.token,id:adtPid||''},d),'POST');
+    if(!res.ok)throw new Error(res.error);
+    toast(adtPid?'Actualizado.':'Persona agregada.','ok');cerrar('ov-adtp');await cargarAdt();
+  }catch(e){toast(e.message,'err');}finally{this.disabled=false;}
+});
+async function borrarPersonaAdt(id){
+  const p=ADP.find(x=>x.id===id);
+  const ok=await confirmar({titulo:'Borrar persona',msg:'¿Borrar a "'+((p&&p.nombre)||id)+'" con todos sus cursos?',ok:'Sí, borrar',danger:true});
+  if(!ok)return;
+  try{const res=await api({action:'adt_persona_borrar',token:S.token,id},'POST');if(!res.ok)throw new Error(res.error);
+    toast('Borrado.','ok');await cargarAdt();
+  }catch(e){toast(e.message,'err');}
+}
+function abrirCursoNuevo(pid){
+  adtKid=null; adtPid=pid; const p=ADP.find(x=>x.id===pid);
+  document.getElementById('curso-title').textContent='Agregar curso';
+  document.getElementById('curso-quien').textContent=p?((p.grado?p.grado+' ':'')+p.nombre):'';
+  ['k-curso','k-anio','k-lugar','k-obs'].forEach(i=>document.getElementById(i).value='');
+  abrir('ov-curso');
+}
+function abrirCursoEdit(id){
+  const c=ADC.find(x=>x.id===id); if(!c)return; adtKid=id; adtPid=c.personaId;
+  const p=ADP.find(x=>x.id===c.personaId);
+  document.getElementById('curso-title').textContent='Editar curso';
+  document.getElementById('curso-quien').textContent=p?((p.grado?p.grado+' ':'')+p.nombre):'';
+  document.getElementById('k-curso').value=c.curso||'';
+  document.getElementById('k-anio').value=c.anio||'';
+  document.getElementById('k-lugar').value=c.lugar||'';
+  document.getElementById('k-obs').value=c.observaciones||'';
+  abrir('ov-curso');
+}
+document.getElementById('curso-save').addEventListener('click',async function(){
+  const curso=document.getElementById('k-curso').value.trim();
+  if(!curso){toast('Escribe el nombre del curso.','err');return;}
+  const d={curso,anio:document.getElementById('k-anio').value.trim(),lugar:document.getElementById('k-lugar').value.trim(),observaciones:document.getElementById('k-obs').value.trim()};
+  this.disabled=true;
+  try{
+    const res=await api(Object.assign({action:adtKid?'adt_curso_editar':'adt_curso_crear',token:S.token,id:adtKid||'',personaId:adtPid},d),'POST');
+    if(!res.ok)throw new Error(res.error);
+    toast(adtKid?'Curso actualizado.':'Curso agregado.','ok');cerrar('ov-curso');await cargarAdt();
+  }catch(e){toast(e.message,'err');}finally{this.disabled=false;}
+});
+async function borrarCurso(id){
+  const c=ADC.find(x=>x.id===id);
+  const ok=await confirmar({titulo:'Borrar curso',msg:'¿Borrar "'+((c&&c.curso)||id)+'"?',ok:'Sí, borrar',danger:true});
+  if(!ok)return;
+  try{const res=await api({action:'adt_curso_borrar',token:S.token,id},'POST');if(!res.ok)throw new Error(res.error);
+    toast('Curso borrado.','ok');await cargarAdt();
+  }catch(e){toast(e.message,'err');}
+}
+function exportarAdt(){
+  if(typeof XLSX==='undefined'){toast('No se pudo cargar el exportador.','err');return;}
+  if(!ADP.length){toast('No hay datos para exportar.','err');return;}
+  const filas=[];
+  ADP.forEach(p=>{
+    const cs=cursosDe(p.id);
+    if(cs.length) cs.forEach(c=>filas.push({Categoria:p.categoria||'',Grado:p.grado||'',Arma:p.arma||'',Nombre:p.nombre,Unidad:p.unidad||'',Curso:c.curso,Anio:c.anio||'',Lugar:c.lugar||'',Observaciones:c.observaciones||''}));
+    else filas.push({Categoria:p.categoria||'',Grado:p.grado||'',Arma:p.arma||'',Nombre:p.nombre,Unidad:p.unidad||'',Curso:'',Anio:'',Lugar:'',Observaciones:''});
+  });
+  const ws=XLSX.utils.json_to_sheet(filas);
+  const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,'Adiestramiento');
+  const f=new Date();
+  XLSX.writeFile(wb,'Adiestramiento_'+f.getFullYear()+pad(f.getMonth()+1)+pad(f.getDate())+'.xlsx');
+  toast('Excel generado.','ok');
+}
 
 /* ── USUARIOS ── */
 async function cargarUsuarios(){
