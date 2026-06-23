@@ -602,6 +602,7 @@ function pintarPersonal(){
   CATEGORIAS.forEach(cat=>{
     const g=arr.filter(p=>p.categoria===cat);
     if(!g.length)return;
+    g.sort((a,b)=>jerarquiaDe(a)-jerarquiaDe(b) || (a.nombre||'').localeCompare(b.nombre||'','es'));
     html+=`<div class="cat-h">${esc(cat)} <span class="cnt">${g.length}</span></div><div class="tbl-wrap"><table><thead><tr><th>Persona</th><th>Situación</th><th></th></tr></thead><tbody>`;
     html+=g.map(p=>{
       const det=detalleTxt(p);
