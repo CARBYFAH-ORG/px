@@ -335,19 +335,23 @@
       <!-- REPORTE WHATSAPP -->
       <section class="view" id="v-reportewa">
         <div class="page-title">Reporte WhatsApp</div>
-        <div class="page-sub">Genera un mensaje con los cambios en métricas de cada perfil, listo para enviar.</div>
+        <div class="page-sub">Filtra los perfiles que quieres incluir en el mensaje. Los que tienen cambios aparecen primero.</div>
         <div class="toolbar">
           <label style="font-size:.85rem;color:var(--text-dim)">Fecha:</label>
-          <input type="date" id="rwa-fecha" onchange="armarReporteWA()">
+          <input type="date" id="rwa-fecha" onchange="armarReporteWA()" style="min-width:auto;flex:none;width:155px">
+          <select id="rwa-red" onchange="armarReporteWA()"><option value="">Todas las redes</option></select>
+          <select id="rwa-riesgo" onchange="armarReporteWA()"><option value="">Todo riesgo</option></select>
           <select id="rwa-filtro" onchange="armarReporteWA()">
             <option value="todos">Todos los perfiles</option>
             <option value="cambios">Solo con cambios</option>
-            <option value="alto">Solo riesgo alto</option>
           </select>
+        </div>
+        <div class="toolbar" style="margin-top:-8px">
           <button class="btn" onclick="abrirEncabezadoPX()">Editar encabezado</button>
           <div style="flex:1"></div>
-          <button class="btn btn-primary" onclick="copiarReporteWA()">⎘ Copiar mensaje</button>
-          <button class="btn" style="background:#25D366;border-color:#25D366;color:#fff" onclick="enviarReporteWA()">Enviar por WhatsApp</button>
+          <span id="rwa-count" style="font-size:.82rem;color:var(--text-dim)"></span>
+          <button class="btn btn-primary" onclick="copiarReporteWA()">⎘ Copiar</button>
+          <button class="btn" style="background:#25D366;border-color:#25D366;color:#fff" onclick="enviarReporteWA()">WhatsApp</button>
         </div>
         <div class="parte-box" id="rwa-out">—</div>
       </section>
@@ -653,6 +657,8 @@ function pintarFiltros(){
   document.getElementById('fil-red').innerHTML='<option value="">Todas las redes</option>'+CAT.red.map(v=>`<option>${esc(v)}</option>`).join('');
   document.getElementById('fil-riesgo').innerHTML='<option value="">Todo riesgo</option>'+CAT.riesgo.map(v=>`<option>${esc(v)}</option>`).join('');
   document.getElementById('fil-estado').innerHTML='<option value="">Todo estado</option>'+CAT.estado.map(v=>`<option>${esc(v)}</option>`).join('');
+  document.getElementById('rwa-red').innerHTML='<option value="">Todas las redes</option>'+CAT.red.map(v=>`<option>${esc(v)}</option>`).join('');
+  document.getElementById('rwa-riesgo').innerHTML='<option value="">Todo riesgo</option>'+CAT.riesgo.map(v=>`<option>${esc(v)}</option>`).join('');
 }
 
 /* ── helpers ── */
@@ -788,77 +794,88 @@ function deltaStr(actual, anterior){
 function armarReporteWA(){
   const fecha = document.getElementById('rwa-fecha').value || hoyISO();
   const filtro = document.getElementById('rwa-filtro').value;
+  const filRed = document.getElementById('rwa-red').value;
+  const filRiesgo = document.getElementById('rwa-riesgo').value;
 
   if(!PERF.length){
     document.getElementById('rwa-out').textContent='Aún no hay perfiles registrados. Ve a "Perfiles" y agrega el primero.';
+    document.getElementById('rwa-count').textContent='';
     window._rwaTxt=''; return;
   }
 
-  // Agrupar perfiles por red social
+  // Pre-calcular cambios de cada perfil
+  const datos = PERF.map(p => {
+    const caps = capsDe(p.id);
+    const ult = caps.length ? caps[caps.length-1] : null;
+    const pen = caps.length >= 2 ? caps[caps.length-2] : null;
+    let hayCambio = false;
+    if(ult && pen){
+      if(ult.seguidores !== pen.seguidores || ult.meGusta !== pen.meGusta ||
+         ult.siguiendo !== pen.siguiendo || ult.publicaciones !== pen.publicaciones) hayCambio = true;
+    }
+    return {p, ult, pen, hayCambio};
+  });
+
+  // Filtrar
+  let filtrados = datos.filter(d => {
+    if(filRed && (d.p.redSocial||'') !== filRed) return false;
+    if(filRiesgo && (d.p.nivelRiesgo||'') !== filRiesgo) return false;
+    if(filtro === 'cambios' && !d.hayCambio) return false;
+    return true;
+  });
+
+  const totalConCambios = filtrados.filter(d => d.hayCambio).length;
+  const totalAlto = filtrados.filter(d => /alto/i.test(d.p.nivelRiesgo||'')).length;
+
+  if(!filtrados.length){
+    document.getElementById('rwa-out').textContent='Ningún perfil coincide con los filtros seleccionados.';
+    document.getElementById('rwa-count').textContent='0 perfiles';
+    window._rwaTxt=''; return;
+  }
+
+  // Agrupar por red social
   const redes = {};
-  PERF.forEach(p=>{
-    const red = p.redSocial || '(Sin red)';
-    (redes[red] = redes[red] || []).push(p);
+  filtrados.forEach(d => {
+    const red = d.p.redSocial || '(Sin red)';
+    (redes[red] = redes[red] || []).push(d);
+  });
+
+  // Dentro de cada red: primero los que tienen cambios, luego el resto
+  Object.values(redes).forEach(arr => {
+    arr.sort((a,b) => (b.hayCambio?1:0) - (a.hayCambio?1:0));
   });
 
   let out = saludoHora()+' '+getEncPX()+' *'+fechaMil(fecha)+'*\n';
-  let num = 0, conCambios = 0, altoCount = 0;
+  let num = 0;
   const redKeys = Object.keys(redes).sort((a,b)=>a.localeCompare(b,'es'));
 
   redKeys.forEach(red => {
-    const perfiles = redes[red];
-    // Preparar datos de cada perfil
-    const filas = [];
-    perfiles.forEach(p => {
-      const caps = capsDe(p.id);
-      const ult = caps.length ? caps[caps.length-1] : null;
-      const pen = caps.length >= 2 ? caps[caps.length-2] : null;
-      const esAlto = /alto/i.test(p.nivelRiesgo||'');
-      if(esAlto) altoCount++;
-
-      // Determinar si hay cambios
-      let hayCambio = false;
-      if(ult && pen){
-        if(ult.seguidores !== pen.seguidores || ult.meGusta !== pen.meGusta ||
-           ult.siguiendo !== pen.siguiendo || ult.publicaciones !== pen.publicaciones) hayCambio = true;
-      }
-      if(hayCambio) conCambios++;
-
-      // Filtrar según selección
-      if(filtro === 'cambios' && !hayCambio) return;
-      if(filtro === 'alto' && !esAlto) return;
-
-      filas.push({p, ult, pen, hayCambio, esAlto});
-    });
-
-    if(!filas.length) return;
-
+    const filas = redes[red];
     out += '\n*'+red.toUpperCase()+'*\n';
     filas.forEach(f => {
       num++;
-      const {p, ult, pen, hayCambio, esAlto} = f;
+      const {p, ult, pen, hayCambio} = f;
       out += num+'. '+p.usuario+'\n';
 
       if(!ult){
         out += '   Sin capturas registradas\n';
       } else if(!pen){
-        // Solo una captura, mostrar valores actuales
         out += '   Seg: '+nf(ult.seguidores)+' · Likes: '+nf(ult.meGusta)+' · Pub: '+nf(ult.publicaciones)+'\n';
       } else {
-        // Dos o más capturas: comparar
         const dSeg = deltaStr(ult.seguidores, pen.seguidores);
         const dLik = deltaStr(ult.meGusta, pen.meGusta);
         const dSig = deltaStr(ult.siguiendo, pen.siguiendo);
         const dPub = deltaStr(ult.publicaciones, pen.publicaciones);
+        const fPen = fechaMil(pen.fecha), fUlt = fechaMil(ult.fecha);
+        const rango = (fPen && fUlt) ? ' ('+fPen+' → '+fUlt+')' : '';
 
-        if(dSeg) out += '   Seg: '+nf(pen.seguidores)+' → '+nf(ult.seguidores)+dSeg+'\n';
+        if(dSeg) out += '   Seg: '+nf(pen.seguidores)+' → '+nf(ult.seguidores)+dSeg+rango+'\n';
         else     out += '   Seg: '+nf(ult.seguidores)+' (sin cambio)\n';
 
         if(dLik) out += '   Likes: '+nf(pen.meGusta)+' → '+nf(ult.meGusta)+dLik+'\n';
         else     out += '   Likes: '+nf(ult.meGusta)+' (sin cambio)\n';
 
         if(dSig) out += '   Sig: '+nf(pen.siguiendo)+' → '+nf(ult.siguiendo)+dSig+'\n';
-
         if(dPub) out += '   Pub: '+nf(pen.publicaciones)+' → '+nf(ult.publicaciones)+dPub+'\n';
       }
 
@@ -871,7 +888,11 @@ function armarReporteWA(){
     });
   });
 
-  out += '\n*RESUMEN: '+pad(PERF.length)+' perfiles · '+conCambios+' con cambios · '+altoCount+' riesgo alto*';
+  out += '\n*RESUMEN: '+pad(filtrados.length)+' perfiles · '+totalConCambios+' con cambios · '+totalAlto+' riesgo alto*';
+
+  document.getElementById('rwa-out').textContent = out;
+  document.getElementById('rwa-count').textContent = filtrados.length+' de '+PERF.length+' perfiles';
+  window._rwaTxt = out;
 
   document.getElementById('rwa-out').textContent = out;
   window._rwaTxt = out;
