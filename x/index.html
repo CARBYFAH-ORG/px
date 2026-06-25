@@ -862,13 +862,12 @@ function armarReporteWA(){
         if(dPub) out += '   Pub: '+nf(pen.publicaciones)+' → '+nf(ult.publicaciones)+dPub+'\n';
       }
 
-      // Indicadores de riesgo y estado
+      // Info del perfil
       const tags = [];
-      if(esAlto) tags.push('Riesgo: '+p.nivelRiesgo);
-      else if(p.nivelRiesgo) tags.push('Riesgo: '+p.nivelRiesgo);
-      if(p.estado) tags.push(p.estado);
-      if(ult && ult.accionTomada) tags.push(ult.accionTomada);
+      if(p.nivelRiesgo) tags.push('Riesgo: '+p.nivelRiesgo);
+      if(p.tipoContenido) tags.push('Contenido: '+p.tipoContenido);
       if(tags.length) out += '   '+tags.join(' · ')+'\n';
+      if(p.notas) out += '   '+p.notas+'\n';
     });
   });
 
