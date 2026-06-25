@@ -344,6 +344,7 @@
             <option value="cambios">Solo con cambios</option>
             <option value="alto">Solo riesgo alto</option>
           </select>
+          <button class="btn" onclick="abrirEncabezadoPX()">Editar encabezado</button>
           <div style="flex:1"></div>
           <button class="btn btn-primary" onclick="copiarReporteWA()">⎘ Copiar mensaje</button>
           <button class="btn" style="background:#25D366;border-color:#25D366;color:#fff" onclick="enviarReporteWA()">Enviar por WhatsApp</button>
@@ -505,6 +506,18 @@
     <div class="modal-h"><h3>Cambiar mi contraseña</h3><button class="modal-x" onclick="cerrar('ov-pass')">&times;</button></div>
     <div class="modal-b"><div class="field"><label>Nueva contraseña</label><input id="pw-new" type="text" autocomplete="off"></div></div>
     <div class="modal-f"><button class="btn" onclick="cerrar('ov-pass')">Cancelar</button><button class="btn btn-primary" id="pass-save">Guardar</button></div>
+  </div>
+</div>
+
+<!-- MODAL ENCABEZADO PX -->
+<div class="overlay" id="ov-enc-px">
+  <div class="modal">
+    <div class="modal-h"><h3>Encabezado del reporte</h3><button class="modal-x" onclick="cerrar('ov-enc-px')">&times;</button></div>
+    <div class="modal-b">
+      <div class="field"><label>Texto de saludo (el saludo según hora y la fecha se agregan automáticamente)</label><textarea id="enc-px-txt" style="min-height:100px"></textarea></div>
+      <div class="info-note" style="margin-top:8px">El sistema agrega automáticamente "Buenos días/tardes/noches" según la hora antes de este texto, y la fecha militar al final.</div>
+    </div>
+    <div class="modal-f"><button class="btn" onclick="cerrar('ov-enc-px')">Cancelar</button><button class="btn btn-primary" id="enc-px-save">Guardar</button></div>
   </div>
 </div>
 
@@ -753,6 +766,20 @@ function verDetalle(id){
    Compara última vs penúltima captura de cada perfil y genera
    un mensaje tipo "parte" con los cambios en métricas.
    ══════════════════════════════════════════════════════════════ */
+function saludoHora(){
+  const h = new Date().getHours();
+  if(h >= 5 && h < 12) return 'Buenos días';
+  if(h >= 12 && h < 18) return 'Buenas tardes';
+  return 'Buenas noches';
+}
+const PX_ENC_DEFAULT = 'mi Cnel, muy respetuosamente le reporto a usted el seguimiento de perfiles de redes sociales con la siguiente situación para el día de hoy';
+function getEncPX(){ return store.get('px_encabezado') || PX_ENC_DEFAULT; }
+function abrirEncabezadoPX(){ document.getElementById('enc-px-txt').value = getEncPX(); abrir('ov-enc-px'); }
+document.getElementById('enc-px-save').addEventListener('click',function(){
+  const v = document.getElementById('enc-px-txt').value.trim();
+  store.set('px_encabezado', v || PX_ENC_DEFAULT);
+  toast('Encabezado guardado.','ok'); cerrar('ov-enc-px'); armarReporteWA();
+});
 function deltaStr(actual, anterior){
   const d = actual - anterior;
   if(d === 0) return '';
@@ -774,7 +801,7 @@ function armarReporteWA(){
     (redes[red] = redes[red] || []).push(p);
   });
 
-  let out = '*REPORTE PX* *'+fechaMil(fecha)+'*\n';
+  let out = saludoHora()+' '+getEncPX()+' *'+fechaMil(fecha)+'*\n';
   let num = 0, conCambios = 0, altoCount = 0;
   const redKeys = Object.keys(redes).sort((a,b)=>a.localeCompare(b,'es'));
 
