@@ -26,7 +26,6 @@
   button{font-family:inherit;cursor:pointer}
   .hidden{display:none!important}
 
-  /* ── LOGIN ── */
   #login{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;
     background:radial-gradient(1200px 500px at 50% -10%,#dbe3ff,transparent),var(--bg)}
   .login-card{background:var(--card);border:1px solid var(--border);border-radius:18px;box-shadow:var(--shadow-md);padding:36px 32px;width:100%;max-width:400px;text-align:center}
@@ -44,7 +43,6 @@
   .login-err.show{display:block}
   .login-hint{margin-top:18px;font-size:.74rem;color:var(--text-soft)}
 
-  /* ── SHELL ── */
   #app{display:flex;min-height:100vh}
   .sidebar{width:250px;background:var(--side);color:var(--side-text);display:flex;flex-direction:column;position:fixed;inset:0 auto 0 0;z-index:40;transition:transform .25s}
   .sidebar .brand{display:flex;align-items:center;gap:11px;padding:18px 20px;border-bottom:1px solid #1e293b}
@@ -77,7 +75,6 @@
   .page-title{font-size:1.5rem;font-weight:700;letter-spacing:-.01em;margin-bottom:4px}
   .page-sub{color:var(--text-dim);font-size:.9rem;margin-bottom:22px}
 
-  /* ── CARDS ── */
   .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:26px}
   .stat{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 20px;box-shadow:var(--shadow)}
   .stat .ico{width:42px;height:42px;border-radius:11px;display:grid;place-items:center;margin-bottom:12px}
@@ -100,7 +97,6 @@
   .bars .bf{height:100%;background:var(--primary);border-radius:6px}
   .bars .bn{width:42px;text-align:right;font-weight:600}
 
-  /* ── TOOLBAR / BOTONES ── */
   .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:16px}
   .toolbar input,.toolbar select{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 12px;font-size:.9rem;color:var(--text);font-family:inherit}
   .toolbar input{flex:1;min-width:200px}
@@ -114,7 +110,6 @@
   .btn-danger:hover{background:var(--red-soft)}
   .btn-sm{padding:6px 10px;font-size:.78rem;border-radius:8px}
 
-  /* ── MURO DE PERFILES ── */
   .wall{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:16px}
   .pcard{background:var(--card);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);padding:16px 18px;cursor:pointer;transition:.15s;position:relative}
   .pcard:hover{box-shadow:var(--shadow-md);transform:translateY(-2px)}
@@ -135,7 +130,6 @@
   .pill.slate{background:#e2e8f0;color:#475569}
   .empty{padding:56px 20px;text-align:center;color:var(--text-dim);font-size:.92rem;background:var(--card);border:1px dashed var(--border);border-radius:14px}
 
-  /* ── FICHA DETALLE ── */
   .detail-head{display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap;margin-bottom:8px}
   .detail-head .av{width:56px;height:56px;border-radius:14px;background:var(--primary-soft);color:var(--primary);display:grid;place-items:center;font-weight:700;font-size:1.4rem;flex:none;text-transform:uppercase}
   .detail-head .meta{flex:1;min-width:200px}
@@ -155,7 +149,6 @@
   .seg{display:flex;gap:18px;flex-wrap:wrap;font-size:.85rem;color:var(--text-dim)}
   .seg b{color:var(--text);font-size:1rem}
 
-  /* ── MODAL ── */
   .overlay{position:fixed;inset:0;background:rgba(15,23,42,.45);display:none;align-items:flex-start;justify-content:center;padding:40px 16px;z-index:60;overflow-y:auto}
   .overlay.show{display:flex}
   .modal{background:var(--card);border-radius:16px;box-shadow:var(--shadow-md);width:100%;max-width:560px;animation:fade .2s ease}
@@ -186,7 +179,6 @@
   .ic-btn.danger{color:var(--red-text);border-color:#fca5a5}
   .ic-btn.danger:hover{background:var(--red-soft)}
 
-  /* ── TABLA (usuarios/auditoría) ── */
   .tbl-wrap{background:var(--card);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);overflow-x:auto}
   table{width:100%;border-collapse:collapse}
   thead th{background:var(--soft);text-align:left;font-size:.74rem;text-transform:uppercase;letter-spacing:.04em;color:var(--text-dim);font-weight:600;padding:12px 16px;border-bottom:1px solid var(--border);white-space:nowrap}
@@ -196,19 +188,20 @@
   td .mono{font-family:'JetBrains Mono',monospace;font-size:.8rem;color:var(--text-dim)}
   .acts{display:flex;gap:6px;justify-content:flex-end;flex-wrap:wrap}
 
-  /* ── TOAST ── */
   .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(90px);background:var(--card);border:1px solid var(--border);border-left:4px solid var(--primary);color:var(--text);padding:13px 18px;border-radius:11px;font-size:.88rem;transition:.3s;z-index:80;box-shadow:var(--shadow-md);max-width:90vw}
   .toast.show{transform:translateX(-50%) translateY(0)}
   .toast.err{border-left-color:var(--red)}
   .toast.ok{border-left-color:var(--green)}
 
-  /* ── INFO ── */
   .info-txt{color:var(--text);font-size:.95rem;line-height:1.65}
   .info-txt p{margin-bottom:12px}
   .info-note{background:var(--soft);border:1px solid var(--border);border-left:4px solid var(--amber);border-radius:10px;padding:14px 16px;font-size:.88rem;color:var(--text-dim);line-height:1.6;margin-top:8px}
   .info-note b{color:var(--text)}
   .wa-btn{display:inline-flex;align-items:center;gap:9px;background:#25D366;color:#fff;border:none;border-radius:11px;padding:12px 20px;font-weight:600;font-size:.95rem;text-decoration:none}
   .wa-btn svg{width:20px;height:20px}
+
+  /* PARTE preview box */
+  .parte-box{background:#0f172a;color:#e2e8f0;border-radius:14px;padding:18px 20px;font-family:'JetBrains Mono',monospace;font-size:.82rem;line-height:1.55;white-space:pre-wrap;word-break:break-word;max-height:60vh;overflow-y:auto;border:1px solid #1e293b}
 
   body:not(.role-admin) .only-admin{display:none!important}
 
@@ -233,11 +226,9 @@
     .row-item .ri-date{order:-1;font-size:.72rem}
     .seg{gap:10px}
   }
-  /* enlaces y textos largos nunca desbordan */
   .row-item a,.row-item .ri-main{overflow-wrap:anywhere;word-break:break-word;min-width:0}
   .detail-head .meta .sub{overflow-wrap:anywhere}
 
-  /* ── Backdrop móvil + sidebar colapsable ── */
   .backdrop{position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:35;display:none}
   .backdrop.show{display:block}
   @media(min-width:881px){
@@ -257,7 +248,7 @@
 </head>
 <body>
 
-<!-- ══════════ LOGIN ══════════ -->
+<!-- LOGIN -->
 <div id="login">
   <div class="login-card">
     <img src="logo.png" class="logo" alt="PX" onerror="this.style.display='none';document.getElementById('lf').style.display='flex'">
@@ -275,7 +266,7 @@
   </div>
 </div>
 
-<!-- ══════════ APP ══════════ -->
+<!-- APP -->
 <div id="app" class="hidden">
   <aside class="sidebar" id="sidebar">
     <div class="brand">
@@ -287,6 +278,7 @@
       <div class="grp">Principal</div>
       <a data-view="dashboard" class="active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>Panel</a>
       <a data-view="perfiles"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20a8 8 0 0 1 16 0"/></svg>Perfiles</a>
+      <a data-view="reportewa"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Reporte WA</a>
       <a data-view="reportes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h12l4 4v12H4z"/><path d="M9 13l2 2 4-4"/></svg>Reportes</a>
       <div class="grp only-admin">Administración</div>
       <a data-view="catalogos" class="only-admin"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h10"/><circle cx="19" cy="17" r="2"/></svg>Catálogos</a>
@@ -323,7 +315,7 @@
         <div class="panel"><div class="panel-h"><h3>Por nivel de riesgo</h3></div><div class="panel-b bars" id="dash-riesgo"></div></div>
       </section>
 
-      <!-- PERFILES (muro) -->
+      <!-- PERFILES -->
       <section class="view" id="v-perfiles">
         <div class="page-title">Perfiles</div>
         <div class="page-sub">Toca un perfil para ver su historial, capturas y publicaciones.</div>
@@ -339,6 +331,25 @@
 
       <!-- DETALLE -->
       <section class="view" id="v-detalle"></section>
+
+      <!-- REPORTE WHATSAPP -->
+      <section class="view" id="v-reportewa">
+        <div class="page-title">Reporte WhatsApp</div>
+        <div class="page-sub">Genera un mensaje con los cambios en métricas de cada perfil, listo para enviar.</div>
+        <div class="toolbar">
+          <label style="font-size:.85rem;color:var(--text-dim)">Fecha:</label>
+          <input type="date" id="rwa-fecha" onchange="armarReporteWA()">
+          <select id="rwa-filtro" onchange="armarReporteWA()">
+            <option value="todos">Todos los perfiles</option>
+            <option value="cambios">Solo con cambios</option>
+            <option value="alto">Solo riesgo alto</option>
+          </select>
+          <div style="flex:1"></div>
+          <button class="btn btn-primary" onclick="copiarReporteWA()">⎘ Copiar mensaje</button>
+          <button class="btn" style="background:#25D366;border-color:#25D366;color:#fff" onclick="enviarReporteWA()">Enviar por WhatsApp</button>
+        </div>
+        <div class="parte-box" id="rwa-out">—</div>
+      </section>
 
       <!-- REPORTES -->
       <section class="view" id="v-reportes">
@@ -516,6 +527,7 @@
 const API_URL = "https://script.google.com/macros/s/AKfycbwRiNPQ3LWbiaMpaH2hfHL4vz5-U0FJw-F8bPKJOHk0DdvJrswN9ZTy-QJ2w2xayXy9SA/exec";
 /* ════════════════════════════════ */
 
+const MESES=['ENE','FEB','MAR','ABR','MAY','JUN','JUL','AGO','SEP','OCT','NOV','DIC'];
 const _mem={};
 const store={get:k=>{try{return localStorage.getItem(k)}catch(e){return _mem[k]||null}},set:(k,v)=>{try{localStorage.setItem(k,v)}catch(e){_mem[k]=v}},del:k=>{try{localStorage.removeItem(k)}catch(e){delete _mem[k]}}};
 
@@ -538,6 +550,7 @@ function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','
 function nf(n){return (Number(n)||0).toLocaleString('en-US');}
 function pad(n){return String(n).padStart(2,'0');}
 function hoyISO(){const d=new Date();return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());}
+function fechaMil(iso){const m=String(iso).match(/^(\d{4})-(\d{2})-(\d{2})/);if(!m)return'';return m[3]+MESES[(+m[2])-1]+pad((+m[1])%1000);}
 function reloj(){const d=new Date();let h=d.getHours();const a=h<12?'a.m.':'p.m.';h=h%12||12;document.getElementById('clock').textContent=pad(d.getDate())+'/'+pad(d.getMonth()+1)+'/'+d.getFullYear()+' '+h+':'+pad(d.getMinutes())+' '+a;}
 setInterval(reloj,1000);
 
@@ -572,11 +585,12 @@ function mostrarApp(){
   if(store.get('px_sbcol')==='1') document.body.classList.add('sb-collapsed');
   document.getElementById('sb-nombre').textContent=S.nombre;
   document.getElementById('sb-rol').textContent=S.rol;
+  document.getElementById('rwa-fecha').value=hoyISO();
   reloj(); cargar();
 }
 
 /* ── NAV ── */
-const titulos={dashboard:'Panel',perfiles:'Perfiles',detalle:'Ficha de perfil',reportes:'Reportes',catalogos:'Catálogos',usuarios:'Usuarios',auditoria:'Auditoría',ayuda:'Ayuda',acerca:'Acerca de'};
+const titulos={dashboard:'Panel',perfiles:'Perfiles',detalle:'Ficha de perfil',reportewa:'Reporte WA',reportes:'Reportes',catalogos:'Catálogos',usuarios:'Usuarios',auditoria:'Auditoría',ayuda:'Ayuda',acerca:'Acerca de'};
 function irA(v){
   document.querySelectorAll('.nav a').forEach(x=>x.classList.remove('active'));
   const link=document.querySelector('.nav a[data-view="'+v+'"]'); if(link)link.classList.add('active');
@@ -587,6 +601,7 @@ function irA(v){
   document.getElementById('backdrop').classList.remove('show');
   if(v==='dashboard')pintarDashboard();
   if(v==='perfiles')pintarMuro();
+  if(v==='reportewa')armarReporteWA();
   if(v==='reportes')pintarReportes();
   if(v==='catalogos')pintarCatalogos();
   if(v==='usuarios')cargarUsuarios();
@@ -627,7 +642,7 @@ function pintarFiltros(){
   document.getElementById('fil-estado').innerHTML='<option value="">Todo estado</option>'+CAT.estado.map(v=>`<option>${esc(v)}</option>`).join('');
 }
 
-/* ── helpers de datos ── */
+/* ── helpers ── */
 function capsDe(id){return CAPS.filter(c=>c.perfilId===id).sort((a,b)=>(a.fecha||'').localeCompare(b.fecha||''));}
 function pubsDe(id){return PUBS.filter(p=>p.perfilId===id).sort((a,b)=>(b.fechaPub||'').localeCompare(a.fechaPub||''));}
 function ultCap(id){const c=capsDe(id);return c.length?c[c.length-1]:null;}
@@ -666,7 +681,7 @@ function pintarMuro(){
     return true;
   });
   const cont=document.getElementById('wall');
-  if(!arr.length){cont.innerHTML='<div class="empty">No hay perfiles que coincidan. Usa “+ Nuevo perfil” para agregar el primero.</div>';return;}
+  if(!arr.length){cont.innerHTML='<div class="empty">No hay perfiles que coincidan. Usa "+ Nuevo perfil" para agregar el primero.</div>';return;}
   cont.innerHTML=arr.map(p=>{
     const u=ultCap(p.id);
     const ini=(p.usuario||'?').replace(/[@\s]/g,'').slice(0,2)||'?';
@@ -693,7 +708,7 @@ function verDetalle(id){
   const caps=capsDe(id), pubs=pubsDe(id);
   const u=caps.length?caps[caps.length-1]:null;
   const maxSeg=Math.max(1,...caps.map(c=>c.seguidores));
-  const tl=caps.length?`<div class="timeline">${caps.slice(-12).map(c=>`<div class="tl-bar" title="${esc(c.fecha)}: ${nf(c.seguidores)} seguidores"><div class="tf" style="height:${Math.max(4,c.seguidores/maxSeg*120)}px"></div></div>`).join('')}</div><div class="tl-x">${caps.slice(-12).map(c=>`<span>${esc((c.fecha||'').slice(5))}</span>`).join('')}</div>`:'<div class="empty">Sin capturas todavía. Agrega la primera para iniciar la línea de tiempo.</div>';
+  const tl=caps.length?`<div class="timeline">${caps.slice(-12).map(c=>`<div class="tl-bar" title="${esc(c.fecha)}: ${nf(c.seguidores)} seguidores"><div class="tf" style="height:${Math.max(4,c.seguidores/maxSeg*120)}px"></div></div>`).join('')}</div><div class="tl-x">${caps.slice(-12).map(c=>`<span>${esc((c.fecha||'').slice(5))}</span>`).join('')}</div>`:'<div class="empty">Sin capturas todavía.</div>';
   const ini=(p.usuario||'?').replace(/[@\s]/g,'').slice(0,2)||'?';
   const v=document.getElementById('v-detalle');
   v.innerHTML=`
@@ -733,6 +748,127 @@ function verDetalle(id){
   irA('detalle');
 }
 
+/* ══════════════════════════════════════════════════════════════
+   ── REPORTE WHATSAPP (nuevo) ──
+   Compara última vs penúltima captura de cada perfil y genera
+   un mensaje tipo "parte" con los cambios en métricas.
+   ══════════════════════════════════════════════════════════════ */
+function deltaStr(actual, anterior){
+  const d = actual - anterior;
+  if(d === 0) return '';
+  return d > 0 ? ' (▲'+nf(d)+')' : ' (▼'+nf(Math.abs(d))+')';
+}
+function armarReporteWA(){
+  const fecha = document.getElementById('rwa-fecha').value || hoyISO();
+  const filtro = document.getElementById('rwa-filtro').value;
+
+  if(!PERF.length){
+    document.getElementById('rwa-out').textContent='Aún no hay perfiles registrados. Ve a "Perfiles" y agrega el primero.';
+    window._rwaTxt=''; return;
+  }
+
+  // Agrupar perfiles por red social
+  const redes = {};
+  PERF.forEach(p=>{
+    const red = p.redSocial || '(Sin red)';
+    (redes[red] = redes[red] || []).push(p);
+  });
+
+  let out = '*REPORTE PX* *'+fechaMil(fecha)+'*\n';
+  let num = 0, conCambios = 0, altoCount = 0;
+  const redKeys = Object.keys(redes).sort((a,b)=>a.localeCompare(b,'es'));
+
+  redKeys.forEach(red => {
+    const perfiles = redes[red];
+    // Preparar datos de cada perfil
+    const filas = [];
+    perfiles.forEach(p => {
+      const caps = capsDe(p.id);
+      const ult = caps.length ? caps[caps.length-1] : null;
+      const pen = caps.length >= 2 ? caps[caps.length-2] : null;
+      const esAlto = /alto/i.test(p.nivelRiesgo||'');
+      if(esAlto) altoCount++;
+
+      // Determinar si hay cambios
+      let hayCambio = false;
+      if(ult && pen){
+        if(ult.seguidores !== pen.seguidores || ult.meGusta !== pen.meGusta ||
+           ult.siguiendo !== pen.siguiendo || ult.publicaciones !== pen.publicaciones) hayCambio = true;
+      }
+      if(hayCambio) conCambios++;
+
+      // Filtrar según selección
+      if(filtro === 'cambios' && !hayCambio) return;
+      if(filtro === 'alto' && !esAlto) return;
+
+      filas.push({p, ult, pen, hayCambio, esAlto});
+    });
+
+    if(!filas.length) return;
+
+    out += '\n*'+red.toUpperCase()+'*\n';
+    filas.forEach(f => {
+      num++;
+      const {p, ult, pen, hayCambio, esAlto} = f;
+      out += num+'. '+p.usuario+'\n';
+
+      if(!ult){
+        out += '   Sin capturas registradas\n';
+      } else if(!pen){
+        // Solo una captura, mostrar valores actuales
+        out += '   Seg: '+nf(ult.seguidores)+' · Likes: '+nf(ult.meGusta)+' · Pub: '+nf(ult.publicaciones)+'\n';
+        out += '   _(captura inicial, sin comparación)_\n';
+      } else {
+        // Dos o más capturas: comparar
+        const dSeg = deltaStr(ult.seguidores, pen.seguidores);
+        const dLik = deltaStr(ult.meGusta, pen.meGusta);
+        const dSig = deltaStr(ult.siguiendo, pen.siguiendo);
+        const dPub = deltaStr(ult.publicaciones, pen.publicaciones);
+
+        if(dSeg) out += '   Seg: '+nf(pen.seguidores)+' → '+nf(ult.seguidores)+dSeg+'\n';
+        else     out += '   Seg: '+nf(ult.seguidores)+' (sin cambio)\n';
+
+        if(dLik) out += '   Likes: '+nf(pen.meGusta)+' → '+nf(ult.meGusta)+dLik+'\n';
+        else     out += '   Likes: '+nf(ult.meGusta)+' (sin cambio)\n';
+
+        if(dSig) out += '   Sig: '+nf(pen.siguiendo)+' → '+nf(ult.siguiendo)+dSig+'\n';
+
+        if(dPub) out += '   Pub: '+nf(pen.publicaciones)+' → '+nf(ult.publicaciones)+dPub+'\n';
+      }
+
+      // Indicadores de riesgo y estado
+      const tags = [];
+      if(esAlto) tags.push('⚠ Riesgo: '+p.nivelRiesgo);
+      else if(p.nivelRiesgo) tags.push('Riesgo: '+p.nivelRiesgo);
+      if(p.estado) tags.push(p.estado);
+      if(ult && ult.accionTomada) tags.push(ult.accionTomada);
+      if(tags.length) out += '   '+tags.join(' · ')+'\n';
+    });
+  });
+
+  out += '\n*RESUMEN: '+pad(PERF.length)+' perfiles · '+conCambios+' con cambios · '+altoCount+' riesgo alto*';
+
+  document.getElementById('rwa-out').textContent = out;
+  window._rwaTxt = out;
+}
+function copiarReporteWA(){
+  if(!PERF.length){toast('No hay perfiles para generar el reporte.','err');return;}
+  const txt=window._rwaTxt||'';
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(txt).then(()=>toast('Mensaje copiado.','ok')).catch(()=>copiaManualRWA(txt));
+  }else copiaManualRWA(txt);
+}
+function copiaManualRWA(txt){
+  const ta=document.createElement('textarea');ta.value=txt;document.body.appendChild(ta);ta.select();
+  try{document.execCommand('copy');toast('Mensaje copiado.','ok');}catch(e){toast('Copia manualmente desde el recuadro.','err');}
+  document.body.removeChild(ta);
+}
+function enviarReporteWA(){
+  if(!PERF.length){toast('No hay perfiles para generar el reporte.','err');return;}
+  const txt=window._rwaTxt||'';
+  window.open('https://wa.me/?text='+encodeURIComponent(txt),'_blank');
+}
+
 /* ── NUEVO/EDITAR PERFIL ── */
 function abrirNuevoPerfil(){
   perfilCtx=null;
@@ -743,8 +879,6 @@ function abrirNuevoPerfil(){
   document.getElementById('p-responsable').value=S.nombre;
   document.getElementById('p-cfecha').value=hoyISO();
   ['p-cseg','p-csig','p-cmeg','p-cpub'].forEach(i=>document.getElementById(i).value='');
-  // mostrar campos de captura inicial
-  document.querySelectorAll('#cap-sec ~ .field').forEach(()=>{});
   abrir('ov-perfil');
 }
 function abrirEditarPerfil(id){
@@ -761,12 +895,6 @@ function abrirEditarPerfil(id){
   document.getElementById('p-riesgo').value=p.nivelRiesgo||'';
   document.getElementById('p-estado').value=p.estado||'';
   abrir('ov-perfil');
-}
-// ocultar/mostrar campos de captura junto con la etiqueta
-function toggleCapFields(show){
-  let el=document.getElementById('cap-sec');
-  const ids=['p-cfecha','p-cseg','p-csig','p-cmeg','p-cpub','p-caccion'];
-  ids.forEach(i=>{const f=document.getElementById(i).closest('.field');if(f)f.style.display=show?'':'none';});
 }
 document.getElementById('perfil-save').addEventListener('click',async function(){
   const base={
@@ -956,7 +1084,7 @@ async function cargarAuditoria(){
   }catch(e){toast(e.message,'err');}
 }
 
-/* ── MODALES UTIL ── */
+/* ── MODALES ── */
 const ICO_INFO='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg>';
 const ICO_DANGER='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.3 4.3 2.6 18a2 2 0 0 0 1.7 3h15.4a2 2 0 0 0 1.7-3L13.7 4.3a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>';
 function confirmar(opt){
@@ -976,12 +1104,10 @@ function abrir(id){document.getElementById(id).classList.add('show');}
 function cerrar(id){document.getElementById(id).classList.remove('show');}
 document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('show');}));
 
-/* ── LISTENERS LOGIN ── */
 document.getElementById('l-btn').addEventListener('click',entrar);
 document.getElementById('l-pass').addEventListener('keydown',e=>{if(e.key==='Enter')entrar();});
 document.getElementById('btn-logout').addEventListener('click',()=>{confirmar({titulo:'Cerrar sesión',msg:'¿Salir del sistema?',ok:'Cerrar sesión'}).then(s=>{if(s)cerrarSesion(false);});});
 
-/* ── INIT ── */
 (function init(){ reloj(); if(S.token) mostrarApp(); })();
 </script>
 </body>
