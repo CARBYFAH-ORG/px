@@ -331,7 +331,7 @@ body:not(.role-admin) .only-admin{display:none!important}
 
 <div class="toast" id="toast"></div>
 <script>
-const API_URL="https://script.google.com/macros/s/AKfycbySuHwRhyrw4FzNVCSCOg_yNThH24cfWBnhLBmGFIMdTdwASutxY5Blp9Lgpd_aOAy9QA/exec";
+const API_URL="https://script.google.com/macros/s/AKfycbwRiNPQ3LWbiaMpaH2hfHL4vz5-U0FJw-F8bPKJOHk0DdvJrswN9ZTy-QJ2w2xayXy9SA/exec";
 const MESES=['ENE','FEB','MAR','ABR','MAY','JUN','JUL','AGO','SEP','OCT','NOV','DIC'];
 const _mem={};const store={get:k=>{try{return localStorage.getItem(k)}catch(e){return _mem[k]||null}},set:(k,v)=>{try{localStorage.setItem(k,v)}catch(e){_mem[k]=v}},del:k=>{try{localStorage.removeItem(k)}catch(e){delete _mem[k]}}};
 let S={token:store.get('px_token'),rol:store.get('px_rol'),nombre:store.get('px_nombre'),usuario:store.get('px_user')};
@@ -455,6 +455,7 @@ function abrirEncabezadoPX(){document.getElementById('enc-px-txt').value=getEncP
 document.getElementById('enc-px-save').addEventListener('click',function(){store.set('px_encabezado',document.getElementById('enc-px-txt').value.trim()||PX_ENC_DEFAULT);toast('Guardado.','ok');cerrar('ov-enc-px');armarReporteWA();});
 function deltaStr(a,b){const d=a-b;if(d===0)return'';return d>0?' (▲'+nf(d)+')':' (▼'+nf(Math.abs(d))+')';}
 
+/* ************ MODIFICACIÓN AQUÍ: doble salto entre perfiles ************ */
 function armarReporteWA(){
   const fecha=document.getElementById('rwa-fecha').value||hoyISO();
   const filtro=document.getElementById('rwa-filtro').value;
@@ -479,21 +480,21 @@ function armarReporteWA(){
     const tg=[];if(p.nivelRiesgo)tg.push('Riesgo: '+p.nivelRiesgo);if(p.tipoContenido)tg.push('Contenido: '+p.tipoContenido);if(tg.length)out+='   '+tg.join(' · ')+'\n';if(p.notas)out+='   '+p.notas+'\n';}
 
   if(modo==='sujeto'){
-    // Agrupar por sujeto
     const porSuj={};const sinSuj=[];
     fil.forEach(d=>{const sid=d.p.sujetoId;if(sid){(porSuj[sid]=porSuj[sid]||[]).push(d);}else sinSuj.push(d);});
-    // Ordenar: cambios primero dentro de cada grupo
     Object.values(porSuj).forEach(a=>a.sort((a,b)=>(b.hayCambio?1:0)-(a.hayCambio?1:0)));
     sinSuj.sort((a,b)=>(b.hayCambio?1:0)-(a.hayCambio?1:0));
     Object.keys(porSuj).forEach(sid=>{const suj=SUJ.find(s=>s.id===sid);out+='\n*SUJETO: '+(suj?suj.alias:'Desconocido')+'*\n';
       if(suj){const inf=[];if(suj.nombreReal)inf.push('Nombre: '+suj.nombreReal);if(suj.telefonos)inf.push('Tel: '+suj.telefonos);if(suj.prioridad)inf.push('Prioridad: '+suj.prioridad);if(inf.length)out+=inf.join(' · ')+'\n';}
-      porSuj[sid].forEach(f=>{const{p}=f;out+='\n  _'+p.redSocial+' · '+p.usuario+'_\n';escribirPerfil(f);});});
-    if(sinSuj.length){out+='\n*SIN SUJETO ASIGNADO*\n';sinSuj.forEach(escribirPerfil);}
+      const arr=porSuj[sid];
+      for(let i=0;i<arr.length;i++){const f=arr[i];const{p}=f;out+='\n  _'+p.redSocial+' · '+p.usuario+'_\n';escribirPerfil(f);if(i<arr.length-1)out+='\n';}});
+    if(sinSuj.length){out+='\n*SIN SUJETO ASIGNADO*\n';
+      for(let i=0;i<sinSuj.length;i++){escribirPerfil(sinSuj[i]);if(i<sinSuj.length-1)out+='\n';}}
   } else {
-    // Agrupar por red social
     const redes={};fil.forEach(d=>{const r=d.p.redSocial||'(Sin red)';(redes[r]=redes[r]||[]).push(d);});
     Object.values(redes).forEach(a=>a.sort((a,b)=>(b.hayCambio?1:0)-(a.hayCambio?1:0)));
-    Object.keys(redes).sort((a,b)=>a.localeCompare(b,'es')).forEach(red=>{out+='\n*'+red.toUpperCase()+'*\n';redes[red].forEach(escribirPerfil);});
+    Object.keys(redes).sort((a,b)=>a.localeCompare(b,'es')).forEach(red=>{out+='\n*'+red.toUpperCase()+'*\n';const arr=redes[red];
+      for(let i=0;i<arr.length;i++){escribirPerfil(arr[i]);if(i<arr.length-1)out+='\n';}});
   }
   out+='\n*RESUMEN: '+pad(fil.length)+' perfiles · '+tCambios+' con cambios · '+tAlto+' riesgo alto*';
   document.getElementById('rwa-out').textContent=out;document.getElementById('rwa-count').textContent=fil.length+' de '+PERF.length;window._rwaTxt=out;
@@ -538,4 +539,5 @@ document.getElementById('l-btn').addEventListener('click',entrar);document.getEl
 document.getElementById('btn-logout').addEventListener('click',()=>{confirmar({titulo:'Cerrar sesión',msg:'¿Salir?',ok:'Cerrar sesión'}).then(s=>{if(s)cerrarSesion(false);});});
 (function(){reloj();if(S.token)mostrarApp();})();
 </script>
-</body></html>
+</body>
+</html>
