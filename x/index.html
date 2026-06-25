@@ -36,7 +36,7 @@
   .login-card label{display:block;text-align:left;font-size:.82rem;font-weight:500;color:var(--text-dim);margin:14px 0 6px}
   .login-card input{width:100%;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 13px;font-size:.95rem;color:var(--text)}
   .login-card input:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-soft)}
-  .login-card button{width:100%;margin-top:22px;background:var(--primary);color:#fff;border:none;border-radius:11px;padding:13px;font-weight:600;font-size:.98rem;transition:.15s;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+  .login-card button{width:100%;margin-top:22px;background:var(--primary);color:#fff;border:none;border-radius:11px;padding:13px;font-weight:600;font-size:.98rem;transition:.15s}
   .login-card button:hover{background:var(--primary-dark)}
   .login-card button:disabled{opacity:.6}
   .login-err{margin-top:14px;background:var(--red-soft);border:1px solid #fca5a5;color:var(--red-text);font-size:.83rem;padding:10px 12px;border-radius:9px;display:none}
@@ -202,10 +202,6 @@
 
   /* PARTE preview box */
   .parte-box{background:#0f172a;color:#e2e8f0;border-radius:14px;padding:18px 20px;font-family:'JetBrains Mono',monospace;font-size:.82rem;line-height:1.55;white-space:pre-wrap;word-break:break-word;max-height:60vh;overflow-y:auto;border:1px solid #1e293b}
-
-  /* Spinner para botones de acción */
-  .spinner{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:-3px;margin-right:6px}
-  @keyframes spin{to{transform:rotate(360deg)}}
 
   body:not(.role-admin) .only-admin{display:none!important}
 
@@ -431,13 +427,13 @@
       <div class="field"><label>Estado de seguimiento</label><select id="p-estado"></select></div>
       <div class="field"><label>Responsable</label><input id="p-responsable" autocomplete="off"></div>
       <div class="field full"><label>Notas</label><textarea id="p-notas"></textarea></div>
-      <div class="sec-label js-cap" id="cap-sec">Captura inicial de métricas (opcional)</div>
-      <div class="field js-cap"><label>Fecha de toma</label><input type="date" id="p-cfecha"></div>
-      <div class="field js-cap"><label>Seguidores</label><input type="number" id="p-cseg" min="0" inputmode="numeric"></div>
-      <div class="field js-cap"><label>Siguiendo</label><input type="number" id="p-csig" min="0" inputmode="numeric"></div>
-      <div class="field js-cap"><label>Me gusta</label><input type="number" id="p-cmeg" min="0" inputmode="numeric"></div>
-      <div class="field js-cap"><label>Nº publicaciones</label><input type="number" id="p-cpub" min="0" inputmode="numeric"></div>
-      <div class="field js-cap"><label>Acción tomada</label><select id="p-caccion"></select></div>
+      <div class="sec-label" id="cap-sec">Captura inicial de métricas (opcional)</div>
+      <div class="field"><label>Fecha de toma</label><input type="date" id="p-cfecha"></div>
+      <div class="field"><label>Seguidores</label><input type="number" id="p-cseg" min="0" inputmode="numeric"></div>
+      <div class="field"><label>Siguiendo</label><input type="number" id="p-csig" min="0" inputmode="numeric"></div>
+      <div class="field"><label>Me gusta</label><input type="number" id="p-cmeg" min="0" inputmode="numeric"></div>
+      <div class="field"><label>Nº publicaciones</label><input type="number" id="p-cpub" min="0" inputmode="numeric"></div>
+      <div class="field"><label>Acción tomada</label><select id="p-caccion"></select></div>
     </div></div>
     <div class="modal-f"><button class="btn" onclick="cerrar('ov-perfil')">Cancelar</button><button class="btn btn-primary" id="perfil-save">Guardar</button></div>
   </div>
@@ -519,7 +515,7 @@
     <div class="modal-h"><h3>Encabezado del reporte</h3><button class="modal-x" onclick="cerrar('ov-enc-px')">&times;</button></div>
     <div class="modal-b">
       <div class="field"><label>Texto de saludo (el saludo según hora y la fecha se agregan automáticamente)</label><textarea id="enc-px-txt" style="min-height:100px"></textarea></div>
-      <div class="info-note" style="margin-top:8px">El sistema agrega automáticamente "Buenos días/tardes/noches" según la hora antes de este texto, y la fecha militar al final. Puedes cambiar el grado (por ejemplo "mi Coronel", "mi General") aquí.</div>
+      <div class="info-note" style="margin-top:8px">El sistema agrega automáticamente "Buenos días/tardes/noches" según la hora antes de este texto, y la fecha militar al final.</div>
     </div>
     <div class="modal-f"><button class="btn" onclick="cerrar('ov-enc-px')">Cancelar</button><button class="btn btn-primary" id="enc-px-save">Guardar</button></div>
   </div>
@@ -571,25 +567,12 @@ function fechaMil(iso){const m=String(iso).match(/^(\d{4})-(\d{2})-(\d{2})/);if(
 function reloj(){const d=new Date();let h=d.getHours();const a=h<12?'a.m.':'p.m.';h=h%12||12;document.getElementById('clock').textContent=pad(d.getDate())+'/'+pad(d.getMonth()+1)+'/'+d.getFullYear()+' '+h+':'+pad(d.getMinutes())+' '+a;}
 setInterval(reloj,1000);
 
-/* Spinner en botones de acción */
-function setLoading(btn, loading){
-  if(!btn) return;
-  if(loading){
-    if(btn._orig===undefined) btn._orig = btn.innerHTML;
-    btn.disabled = true;
-    btn.innerHTML = '<span class="spinner"></span>Procesando…';
-  } else {
-    btn.disabled = false;
-    if(btn._orig!==undefined){ btn.innerHTML = btn._orig; btn._orig = undefined; }
-  }
-}
-
 /* ── LOGIN ── */
 async function entrar(){
   const usuario=document.getElementById('l-user').value.trim(), pass=document.getElementById('l-pass').value;
   const err=document.getElementById('l-err'); err.classList.remove('show');
   if(!usuario||!pass){err.textContent='Escribe usuario y contraseña.';err.classList.add('show');return;}
-  const btn=document.getElementById('l-btn'); setLoading(btn,true);
+  const btn=document.getElementById('l-btn'); btn.disabled=true; btn.textContent='Ingresando…';
   try{
     const res=await api({action:'login',usuario,pass},'POST');
     if(!res.ok){err.textContent=res.error||'No se pudo ingresar.';err.classList.add('show');return;}
@@ -597,7 +580,7 @@ async function entrar(){
     store.set('px_token',S.token);store.set('px_rol',S.rol);store.set('px_nombre',S.nombre);store.set('px_user',S.usuario);
     mostrarApp();
   }catch(e){err.textContent=e.message;err.classList.add('show');}
-  finally{setLoading(btn,false);}
+  finally{btn.disabled=false;btn.textContent='Ingresar';}
 }
 function cerrarSesion(expirada){
   try{ if(S.token) api({action:'logout',token:S.token},'POST'); }catch(e){}
@@ -779,23 +762,18 @@ function verDetalle(id){
 }
 
 /* ══════════════════════════════════════════════════════════════
-   ── REPORTE WHATSAPP ──
+   ── REPORTE WHATSAPP (nuevo) ──
    Compara última vs penúltima captura de cada perfil y genera
    un mensaje tipo "parte" con los cambios en métricas.
    ══════════════════════════════════════════════════════════════ */
 function saludoHora(){
   const h = new Date().getHours();
-  if(h >= 6 && h < 12) return 'Buenos días';
+  if(h >= 5 && h < 12) return 'Buenos días';
   if(h >= 12 && h < 18) return 'Buenas tardes';
   return 'Buenas noches';
 }
-const PX_ENC_DEFAULT = 'mi Coronel, muy respetuosamente le reporto a usted el seguimiento de perfiles de redes sociales con la siguiente situación para el día de';
-const PX_ENC_OLD = 'mi Cnel, muy respetuosamente le reporto a usted el seguimiento de perfiles de redes sociales con la siguiente situación para el día de hoy';
-function getEncPX(){
-  let v = store.get('px_encabezado');
-  if(!v || v===PX_ENC_OLD) v = PX_ENC_DEFAULT;
-  return v;
-}
+const PX_ENC_DEFAULT = 'mi Cnel, muy respetuosamente le reporto a usted el seguimiento de perfiles de redes sociales con la siguiente situación para el día de hoy';
+function getEncPX(){ return store.get('px_encabezado') || PX_ENC_DEFAULT; }
 function abrirEncabezadoPX(){ document.getElementById('enc-px-txt').value = getEncPX(); abrir('ov-enc-px'); }
 document.getElementById('enc-px-save').addEventListener('click',function(){
   const v = document.getElementById('enc-px-txt').value.trim();
@@ -816,6 +794,7 @@ function armarReporteWA(){
     window._rwaTxt=''; return;
   }
 
+  // Agrupar perfiles por red social
   const redes = {};
   PERF.forEach(p=>{
     const red = p.redSocial || '(Sin red)';
@@ -828,6 +807,7 @@ function armarReporteWA(){
 
   redKeys.forEach(red => {
     const perfiles = redes[red];
+    // Preparar datos de cada perfil
     const filas = [];
     perfiles.forEach(p => {
       const caps = capsDe(p.id);
@@ -836,6 +816,7 @@ function armarReporteWA(){
       const esAlto = /alto/i.test(p.nivelRiesgo||'');
       if(esAlto) altoCount++;
 
+      // Determinar si hay cambios
       let hayCambio = false;
       if(ult && pen){
         if(ult.seguidores !== pen.seguidores || ult.meGusta !== pen.meGusta ||
@@ -843,6 +824,7 @@ function armarReporteWA(){
       }
       if(hayCambio) conCambios++;
 
+      // Filtrar según selección
       if(filtro === 'cambios' && !hayCambio) return;
       if(filtro === 'alto' && !esAlto) return;
 
@@ -860,9 +842,10 @@ function armarReporteWA(){
       if(!ult){
         out += '   Sin capturas registradas\n';
       } else if(!pen){
+        // Solo una captura, mostrar valores actuales
         out += '   Seg: '+nf(ult.seguidores)+' · Likes: '+nf(ult.meGusta)+' · Pub: '+nf(ult.publicaciones)+'\n';
-        out += '   _(captura inicial, sin comparación)_\n';
       } else {
+        // Dos o más capturas: comparar
         const dSeg = deltaStr(ult.seguidores, pen.seguidores);
         const dLik = deltaStr(ult.meGusta, pen.meGusta);
         const dSig = deltaStr(ult.siguiendo, pen.siguiendo);
@@ -879,8 +862,9 @@ function armarReporteWA(){
         if(dPub) out += '   Pub: '+nf(pen.publicaciones)+' → '+nf(ult.publicaciones)+dPub+'\n';
       }
 
+      // Indicadores de riesgo y estado
       const tags = [];
-      if(esAlto) tags.push('⚠ Riesgo: '+p.nivelRiesgo);
+      if(esAlto) tags.push('Riesgo: '+p.nivelRiesgo);
       else if(p.nivelRiesgo) tags.push('Riesgo: '+p.nivelRiesgo);
       if(p.estado) tags.push(p.estado);
       if(ult && ult.accionTomada) tags.push(ult.accionTomada);
@@ -912,13 +896,10 @@ function enviarReporteWA(){
 }
 
 /* ── NUEVO/EDITAR PERFIL ── */
-function capFields(show){
-  document.querySelectorAll('#ov-perfil .js-cap').forEach(el=>el.style.display = show ? '' : 'none');
-}
 function abrirNuevoPerfil(){
   perfilCtx=null;
   document.getElementById('perfil-title').textContent='Nuevo perfil';
-  capFields(true);
+  document.getElementById('cap-sec').style.display='';
   ['p-usuario','p-enlace','p-responsable','p-notas'].forEach(i=>document.getElementById(i).value='');
   ['p-red','p-contenido','p-riesgo','p-estado','p-caccion'].forEach(i=>document.getElementById(i).selectedIndex=0);
   document.getElementById('p-responsable').value=S.nombre;
@@ -930,7 +911,7 @@ function abrirEditarPerfil(id){
   const p=PERF.find(x=>x.id===id); if(!p)return;
   perfilCtx=id;
   document.getElementById('perfil-title').textContent='Editar perfil';
-  capFields(false);
+  document.getElementById('cap-sec').style.display='none';
   document.getElementById('p-usuario').value=p.usuario||'';
   document.getElementById('p-enlace').value=p.enlace||'';
   document.getElementById('p-responsable').value=p.responsable||'';
@@ -953,7 +934,7 @@ document.getElementById('perfil-save').addEventListener('click',async function()
     notas:document.getElementById('p-notas').value.trim()
   };
   if(!base.usuario&&!base.enlace){toast('Indica el usuario o el enlace del perfil.','err');return;}
-  setLoading(this,true);
+  this.disabled=true;this.textContent='Guardando…';
   try{
     let res;
     if(perfilCtx){
@@ -972,7 +953,7 @@ document.getElementById('perfil-save').addEventListener('click',async function()
     cerrar('ov-perfil'); await cargar();
     if(perfilCtx) verDetalle(perfilCtx);
   }catch(e){toast(e.message,'err');}
-  finally{setLoading(this,false);}
+  finally{this.disabled=false;this.textContent='Guardar';}
 });
 async function borrarPerfil(id){
   const p=PERF.find(x=>x.id===id);
@@ -993,7 +974,7 @@ function abrirCaptura(id){
   abrir('ov-captura');
 }
 document.getElementById('captura-save').addEventListener('click',async function(){
-  setLoading(this,true);
+  this.disabled=true;
   try{const res=await api({action:'captura_crear',token:S.token,perfilId:perfilCtx,
     fecha:document.getElementById('c-fecha').value,seguidores:document.getElementById('c-seg').value,
     siguiendo:document.getElementById('c-sig').value,meGusta:document.getElementById('c-meg').value,
@@ -1001,7 +982,7 @@ document.getElementById('captura-save').addEventListener('click',async function(
     observaciones:document.getElementById('c-obs').value},'POST');
     if(!res.ok)throw new Error(res.error);
     toast('Captura guardada.','ok'); cerrar('ov-captura'); await cargar(); verDetalle(perfilCtx);
-  }catch(e){toast(e.message,'err');}finally{setLoading(this,false);}
+  }catch(e){toast(e.message,'err');}finally{this.disabled=false;}
 });
 
 /* ── PUBLICACIÓN ── */
@@ -1015,13 +996,13 @@ function abrirPublicacion(id){
 document.getElementById('pub-save').addEventListener('click',async function(){
   const enlace=document.getElementById('b-enlace').value.trim(), desc=document.getElementById('b-desc').value.trim();
   if(!enlace&&!desc){toast('Indica el enlace o una descripción.','err');return;}
-  setLoading(this,true);
+  this.disabled=true;
   try{const res=await api({action:'publicacion_crear',token:S.token,perfilId:perfilCtx,
     enlace,descripcion:desc,fechaPub:document.getElementById('b-fechapub').value,
     tipoContenido:document.getElementById('b-contenido').value},'POST');
     if(!res.ok)throw new Error(res.error);
     toast('Publicación guardada.','ok'); cerrar('ov-pub'); await cargar(); verDetalle(perfilCtx);
-  }catch(e){toast(e.message,'err');}finally{setLoading(this,false);}
+  }catch(e){toast(e.message,'err');}finally{this.disabled=false;}
 });
 
 /* ── REPORTES ── */
@@ -1075,10 +1056,10 @@ function catEdit(tipo,valor){catCtx={tipo,valor};document.getElementById('cat-in
 document.getElementById('cat-save').addEventListener('click',async function(){
   const nuevo=document.getElementById('cat-input').value.trim();
   if(!nuevo){toast('No puede estar vacío.','err');return;}
-  setLoading(this,true);
+  this.disabled=true;
   try{const r=await api({action:'cat_editar',token:S.token,tipo:catCtx.tipo,valor:catCtx.valor,nuevo},'POST');if(!r.ok)throw new Error(r.error);
     toast('Actualizado'+(r.actualizados?' ('+r.actualizados+' registros)':'')+'.','ok');cerrar('ov-cat');await cargar();pintarCatalogos();
-  }catch(e){toast(e.message,'err');}finally{setLoading(this,false);}
+  }catch(e){toast(e.message,'err');}finally{this.disabled=false;}
 });
 async function catDel(tipo,valor){
   const ok=await confirmar({titulo:'Quitar del catálogo',msg:'¿Quitar "'+valor+'"? Los registros que ya lo usan no cambian.',ok:'Sí, quitar',danger:true});
@@ -1109,17 +1090,17 @@ function abrirNuevoUsuario(){['u-user','u-nombre','u-pass'].forEach(i=>document.
 document.getElementById('user-save').addEventListener('click',async function(){
   const d={action:'usuario_crear',token:S.token,usuario:document.getElementById('u-user').value.trim(),nombre:document.getElementById('u-nombre').value.trim(),pass:document.getElementById('u-pass').value,rol:document.getElementById('u-rol').value};
   if(!d.usuario||!d.pass){toast('Usuario y contraseña requeridos.','err');return;}
-  setLoading(this,true);
+  this.disabled=true;
   try{const r=await api(d,'POST');if(!r.ok)throw new Error(r.error);toast('Usuario creado.','ok');cerrar('ov-user');cargarUsuarios();}
-  catch(e){toast(e.message,'err');}finally{setLoading(this,false);}
+  catch(e){toast(e.message,'err');}finally{this.disabled=false;}
 });
 function abrirCambiarPass(){document.getElementById('pw-new').value='';abrir('ov-pass');}
 document.getElementById('pass-save').addEventListener('click',async function(){
   const pass=document.getElementById('pw-new').value;
   if(pass.length<5){toast('Mínimo 5 caracteres.','err');return;}
-  setLoading(this,true);
+  this.disabled=true;
   try{const r=await api({action:'cambiar_pass',token:S.token,pass},'POST');if(!r.ok)throw new Error(r.error);toast('Contraseña cambiada.','ok');cerrar('ov-pass');}
-  catch(e){toast(e.message,'err');}finally{setLoading(this,false);}
+  catch(e){toast(e.message,'err');}finally{this.disabled=false;}
 });
 
 /* ── AUDITORÍA ── */
