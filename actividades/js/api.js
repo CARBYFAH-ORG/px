@@ -5,7 +5,7 @@
 window.APP = window.APP || {};
 
 // ▼ Cambia esta URL cada vez que redespliegues el Apps Script ▼
-const API_URL = 'https://script.google.com/macros/s/AKfycbwb78E2mWcmaW3q2Rpf1J9J_hhMbHup-w0H5y-_LlGuS6NKtNMY5sEksHkM5VZBq2InXw/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbymUdriw8CKyJwjgScvr86cCMCAqhiQAj6GGf2qU67iGb5ajWy-N7jVnKRVfKyKq60Wow/exec';
 
 APP.API = (function () {
 
@@ -17,11 +17,13 @@ APP.API = (function () {
   async function call(action, payload) {
     const body = Object.assign({ action }, payload || {});
 
-    // Adjuntar sesión activa si existe
+    // Adjuntar sesión activa si existe (claves separadas para no chocar
+    // con payloads que también usan "usuario", ej. crear_usuario,
+    // editar_usuario, eliminar_usuario, reset_password)
     const ses = APP.Auth && APP.Auth.session();
     if (ses) {
-      body.usuario = ses.usuario;
-      body.token   = ses.token;
+      body._ses_usuario = ses.usuario;
+      body._ses_token   = ses.token;
     }
 
     try {
