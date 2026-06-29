@@ -45,9 +45,12 @@ function abrirFormUsuario(usr, secs){
   const html = `<div class="modal" onclick="event.stopPropagation()">
     <div class="mh"><h3>${isNew?'Nuevo':'Editar'} usuario</h3><button class="x" onclick="APP.U.closeModal()">×</button></div>
     <div class="mb">
+      <form autocomplete="off" onsubmit="return false">
+      <input type="text" name="fake-user" autocomplete="username" style="display:none">
+      <input type="password" name="fake-pass" autocomplete="new-password" style="display:none">
       <div class="row2">
-        <div><label>Usuario *</label><input id="u-usuario" value="${APP.U.esc(usr?usr.usuario:'')}" ${isNew?'':'disabled'}></div>
-        <div><label>${isNew?'Contraseña *':'Contraseña (vacío = sin cambio)'}</label><input id="u-pass" type="password" placeholder="${isNew?'mínimo 6':'••••••'}"></div>
+        <div><label>Usuario *</label><input id="u-usuario" autocomplete="off" value="${APP.U.esc(usr?usr.usuario:'')}" ${isNew?'':'disabled'}></div>
+        <div><label>${isNew?'Contraseña *':'Contraseña (vacío = sin cambio)'}</label><input id="u-pass" type="password" autocomplete="new-password" placeholder="${isNew?'mínimo 6':'••••••'}"></div>
       </div>
       <div class="row2">
         <div><label>Nombre *</label><input id="u-nombre" value="${APP.U.esc(usr?usr.nombre:'')}"></div>
@@ -75,6 +78,7 @@ function abrirFormUsuario(usr, secs){
       <p style="font-size:.74rem;color:var(--text-soft);margin-top:10px">
         El teléfono se usa para notificaciones diarias por WhatsApp a las 06:30. Formato: número (con código país sin +) seguido de dos puntos y la API key de CallMeBot. Dejar vacío para no recibir notificaciones.
       </p>
+      </form>
     </div>
     <div class="mf">
       ${!isNew && usr.usuario !== 'admin' ? '<button class="btn danger" id="u-del">Eliminar</button>' : ''}
