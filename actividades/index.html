@@ -7,43 +7,49 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-
-<!-- Estilos -->
 <link rel="stylesheet" href="css/styles.css">
-
-<!-- Libs externas -->
+<!-- Chart.js -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<!-- Sortable (Kanban drag&drop) -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.2/Sortable.min.js"></script>
+<!-- SheetJS (Excel export) -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<!-- FullCalendar -->
 <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
 </head>
 <body>
 
-<!-- LOGIN -->
+<!-- ===== LOGIN ===== -->
 <div id="login">
   <div class="login-card">
-    <img class="logo" src="logo.png" alt="" onerror="this.style.display='none'">
+    <img class="logo" src="logo.png" alt="" onerror="this.style.display='none';document.getElementById('logo-fb').style.display='flex'">
+    <div class="logo-fb" id="logo-fb">FA-2</div>
     <h1>Actividades</h1>
     <p class="sub">FA-2 · Inteligencia y Análisis</p>
     <form id="login-form">
       <label>Usuario</label>
-      <input id="login-user" required autocomplete="username">
+      <input id="login-user" required autocomplete="username" placeholder="usuario">
       <label>Contraseña</label>
-      <input id="login-pass" type="password" required autocomplete="current-password">
+      <input id="login-pass" type="password" required autocomplete="current-password" placeholder="••••••••">
       <button id="login-btn" type="submit">Ingresar</button>
       <div class="login-err" id="login-err"></div>
       <div class="login-hint">Acceso reservado al personal del FA-2</div>
     </form>
+    <a class="login-back" href="../">← Volver al portal</a>
   </div>
 </div>
 
-<!-- APP -->
+<!-- ===== APP ===== -->
 <div id="app" class="hidden">
-  <aside class="sidebar">
+  <aside class="sidebar" id="sidebar">
     <div class="brand">
-      <img src="logo.png" alt="" onerror="this.style.display='none'">
-      <div><b>ACTIVIDADES</b><span>FA-2</span></div>
+      <img src="logo.png" alt="" onerror="this.style.display='none';document.getElementById('brand-fb').style.display='grid'">
+      <div class="brand-fb" id="brand-fb">FA</div>
+      <div>
+        <b>ACTIVIDADES</b>
+        <span>FA-2 · Inteligencia</span>
+      </div>
     </div>
     <nav class="nav" id="nav"></nav>
     <div class="sfoot">
@@ -53,23 +59,32 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
         Salir
       </button>
+      <a class="btn-portal" href="../">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+        Portal FA-2
+      </a>
     </div>
   </aside>
 
   <div class="main">
     <header class="topbar">
-      <button class="menubtn" id="menubtn">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      <button class="menubtn" id="menubtn" title="Menú">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
       </button>
       <h2 id="topbar-title">Dashboard</h2>
       <div class="spacer"></div>
+      <div id="topbar-user" class="topbar-user"></div>
     </header>
     <main class="content" id="content"></main>
+    <footer class="foot">Uso interno y reservado · FA-2 · Inteligencia y Análisis</footer>
   </div>
 </div>
 
+<!-- Modal overlay -->
 <div class="modal-bg" id="modal-bg"></div>
-<div class="fullload" id="fullload"><div class="spinner"></div></div>
+<!-- Full-screen loader -->
+<div class="fullload" id="fullload"><div class="spinner lrg"></div></div>
+<!-- Toasts -->
 <div id="toasts"></div>
 
 <!-- Scripts (orden importa) -->
