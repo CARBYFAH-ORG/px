@@ -754,6 +754,10 @@ table.tbl { width: 100%; border-collapse: collapse; }
 }
 .modal textarea { min-height: 80px; }
 .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.modal .row2 { grid-template-columns: 1fr 1fr; }
+@media (max-width: 560px) {
+  .modal .row2, .modal .row3 { grid-template-columns: 1fr !important; }
+}
 .row3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
 
 /* Detalle actividad (grid ficha) */
