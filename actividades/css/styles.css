@@ -444,6 +444,7 @@ input, select, textarea { font-family: inherit; }
   border-radius: var(--radius);
   padding: 20px 22px;
   box-shadow: var(--shadow);
+  min-height: 0;
 }
 .panel h3 {
   font-size: .9rem;
@@ -453,6 +454,16 @@ input, select, textarea { font-family: inherit; }
   display: flex;
   align-items: center;
   gap: 8px;
+}
+/* Contenedor de gráficos Chart.js: altura fija para que el canvas
+   no crezca sin límite cuando no hay datos o el grid lo estira */
+.panel canvas {
+  max-height: 260px !important;
+  width: 100% !important;
+}
+.panel:has(canvas) {
+  display: flex;
+  flex-direction: column;
 }
 
 /* ===== TABLA ===== */
