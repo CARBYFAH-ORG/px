@@ -56,9 +56,10 @@ APP.Views.ficha = {
       if (!data.titulo || !data.seccion || !data.asignado_a || !data.fecha_limite) {
         APP.U.toast('Faltan campos obligatorios','error'); return;
       }
+      const original = this.innerHTML;
       this.disabled = true; this.innerHTML = '<span class="spinner"></span> Creando…';
       const r = await APP.API.call('crear_actividad', data);
-      if (!r.ok) { APP.U.toast(r.error,'error'); this.disabled=false; this.innerHTML='Crear actividad'; return; }
+      if (!r.ok) { APP.U.toast(r.error,'error'); this.disabled=false; this.innerHTML=original; return; }
       APP.U.closeModal();
       APP.U.toast('Actividad creada','success');
       APP.Router.refresh();
@@ -85,12 +86,15 @@ APP.Views.ficha = {
     const puedeCancelar = puedeEditar;
     const finalizada = ['Reportada','Cancelada'].indexOf(a.estado) !== -1;
 
+    const icIniciar = '<svg class="ic-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>';
+    const icCompletar = '<svg class="ic-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>';
+
     let acciones = '';
     if (!finalizada && puedeEstadoUsuario) {
-      if (a.estado === 'Recibida')    acciones += `<button class="btn warn" data-est="En curso">▶ Iniciar</button>`;
-      if (a.estado === 'En curso')    acciones += `<button class="btn" data-est="Completada">✓ Marcar completada</button>`;
-      if (a.estado === 'Completada')  acciones += `<button class="btn success" data-est="Reportada">📤 Reportar al Jefe</button>`;
-      if (a.estado === 'Vencida')     acciones += `<button class="btn success" data-est="Reportada">📤 Reportar (extemporáneo)</button>`;
+      if (a.estado === 'Recibida')    acciones += `<button class="btn warn" data-est="En curso">${icIniciar} Iniciar</button>`;
+      if (a.estado === 'En curso')    acciones += `<button class="btn" data-est="Completada">${icCompletar} Marcar completada</button>`;
+      if (a.estado === 'Completada')  acciones += `<button class="btn success" data-est="Reportada">Reportar al Jefe</button>`;
+      if (a.estado === 'Vencida')     acciones += `<button class="btn success" data-est="Reportada">Reportar (extemporáneo)</button>`;
     }
     if (puedeEditar && !finalizada) acciones += `<button class="btn sec" id="btn-editar">Editar</button>`;
     if (puedeCancelar && !finalizada) acciones += `<button class="btn sec" id="btn-cancelar">Cancelar actividad</button>`;
@@ -113,7 +117,7 @@ APP.Views.ficha = {
           ${a.motivo_cancelacion?`<div class="dg"><span class="l">Motivo cancelación</span><span class="v">${APP.U.esc(a.motivo_cancelacion)}</span></div>`:''}
         </div>
         ${a.descripcion?`<div class="detalle-desc">${APP.U.esc(a.descripcion)}</div>`:''}
-        ${a.reporte_texto?`<div class="detalle-reporte"><b>📤 Reporte:</b><br>${APP.U.esc(a.reporte_texto)}</div>`:''}
+        ${a.reporte_texto?`<div class="detalle-reporte"><b>Reporte:</b><br>${APP.U.esc(a.reporte_texto)}</div>`:''}
 
         <h3 style="margin-top:22px;margin-bottom:0;font-size:.95rem;font-weight:600">Historial</h3>
         <div class="timeline">
@@ -130,21 +134,27 @@ APP.Views.ficha = {
     APP.U.openModal(html);
 
     document.querySelectorAll('[data-est]').forEach(btn => {
-      btn.onclick = () => APP.Views.ficha._cambiarEstado(a.id, btn.dataset.est);
+      btn.onclick = () => APP.Views.ficha._cambiarEstado(a.id, btn.dataset.est, btn);
     });
     const bE = document.getElementById('btn-editar');   if (bE) bE.onclick = () => APP.Views.ficha._editar(a, usrs);
-    const bC = document.getElementById('btn-cancelar'); if (bC) bC.onclick = () => APP.Views.ficha._cancelar(a.id);
-    const bD = document.getElementById('btn-eliminar'); if (bD) bD.onclick = () => APP.Views.ficha._eliminar(a.id);
+    const bC = document.getElementById('btn-cancelar'); if (bC) bC.onclick = () => APP.Views.ficha._cancelar(a.id, bC);
+    const bD = document.getElementById('btn-eliminar'); if (bD) bD.onclick = () => APP.Views.ficha._eliminar(a.id, bD);
   },
 
-  _cambiarEstado: async function(id, estado){
+  _cambiarEstado: async function(id, estado, btn){
     let reporte = '';
     if (estado === 'Reportada') {
       reporte = prompt('Texto del reporte para el Jefe (obligatorio):');
       if (!reporte) return;
     }
+    const original = btn ? btn.innerHTML : null;
+    if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Procesando…'; }
     const r = await APP.API.call('cambiar_estado', {id, estado, reporte_texto:reporte});
-    if (!r.ok) { APP.U.toast(r.error,'error'); return; }
+    if (!r.ok) {
+      APP.U.toast(r.error,'error');
+      if (btn) { btn.disabled = false; btn.innerHTML = original; }
+      return;
+    }
     APP.U.closeModal();
     APP.U.toast(estado === 'Reportada' ? 'Reportada al Jefe' : 'Estado actualizado','success');
     APP.Router.refresh();
@@ -170,6 +180,8 @@ APP.Views.ficha = {
     </div>`;
     APP.U.openModal(html);
     document.getElementById('ed-guardar').onclick = async function(){
+      const original = this.innerHTML;
+      this.disabled = true; this.innerHTML = '<span class="spinner"></span> Guardando…';
       const r = await APP.API.call('editar_actividad', {
         id: a.id,
         titulo: document.getElementById('ed-titulo').value.trim(),
@@ -178,27 +190,39 @@ APP.Views.ficha = {
         prioridad: document.getElementById('ed-prio').value,
         fecha_limite: document.getElementById('ed-limite').value
       });
-      if (!r.ok) { APP.U.toast(r.error,'error'); return; }
+      if (!r.ok) { APP.U.toast(r.error,'error'); this.disabled=false; this.innerHTML=original; return; }
       APP.U.closeModal();
       APP.U.toast('Actualizada','success');
       APP.Router.refresh();
     };
   },
 
-  _cancelar: async function(id){
+  _cancelar: async function(id, btn){
     const motivo = prompt('Motivo de cancelación:');
     if (!motivo) return;
+    const original = btn ? btn.innerHTML : null;
+    if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Cancelando…'; }
     const r = await APP.API.call('cancelar_actividad', {id, motivo});
-    if (!r.ok) { APP.U.toast(r.error,'error'); return; }
+    if (!r.ok) {
+      APP.U.toast(r.error,'error');
+      if (btn) { btn.disabled = false; btn.innerHTML = original; }
+      return;
+    }
     APP.U.closeModal();
     APP.U.toast('Actividad cancelada','warn');
     APP.Router.refresh();
   },
 
-  _eliminar: async function(id){
+  _eliminar: async function(id, btn){
     if (!APP.U.confirmar('¿Eliminar definitivamente esta actividad y su historial?')) return;
+    const original = btn ? btn.innerHTML : null;
+    if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Eliminando…'; }
     const r = await APP.API.call('eliminar_actividad', {id});
-    if (!r.ok) { APP.U.toast(r.error,'error'); return; }
+    if (!r.ok) {
+      APP.U.toast(r.error,'error');
+      if (btn) { btn.disabled = false; btn.innerHTML = original; }
+      return;
+    }
     APP.U.closeModal();
     APP.U.toast('Eliminada','warn');
     APP.Router.refresh();
