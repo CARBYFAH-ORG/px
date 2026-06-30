@@ -24,9 +24,9 @@ APP.Notif = (function(){
     const cont = document.getElementById('content');
     const div = document.createElement('div');
     div.className = 'banner-pendientes '+cls;
-    let inner = `<b>👋 Buen día ${APP.U.esc((u.grado?u.grado+' ':'')+u.nombre)}.</b>`;
+    let inner = `<b>Buen día, ${APP.U.esc((u.grado?u.grado+' ':'')+u.nombre)}.</b>`;
     totales.forEach(t => {
-      inner += `<span class="b-item">• <b>${t.n}</b> ${t.txt}</span>`;
+      inner += `<span class="b-item"><b>${t.n}</b> ${t.txt}</span>`;
     });
     inner += '<button class="b-cerrar" title="Cerrar">×</button>';
     div.innerHTML = inner;
