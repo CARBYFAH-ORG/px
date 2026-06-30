@@ -101,14 +101,18 @@ function abrirFormUsuario(usr, secs){
       telefono: document.getElementById('u-tel').value.trim(),
       activo: document.getElementById('u-act').value === 'true'
     };
+    if (isNew && (!data.usuario || !data.password || !data.nombre)) {
+      APP.U.toast('Faltan campos','error'); return;
+    }
+    const original = this.innerHTML;
+    this.disabled = true; this.innerHTML = '<span class="spinner"></span> Guardando…';
     let r;
     if (isNew) {
-      if (!data.usuario || !data.password || !data.nombre) { APP.U.toast('Faltan campos','error'); return; }
       r = await APP.API.call('crear_usuario', data);
     } else {
       r = await APP.API.call('editar_usuario', data);
     }
-    if (!r.ok) { APP.U.toast(r.error,'error'); return; }
+    if (!r.ok) { APP.U.toast(r.error,'error'); this.disabled=false; this.innerHTML=original; return; }
     APP.U.invalidar('usuarios');
     APP.U.closeModal();
     APP.U.toast('Guardado','success');
@@ -118,8 +122,10 @@ function abrirFormUsuario(usr, secs){
   const bD = document.getElementById('u-del');
   if (bD) bD.onclick = async function(){
     if (!APP.U.confirmar('¿Eliminar usuario '+usr.usuario+'?')) return;
+    const original = this.innerHTML;
+    this.disabled = true; this.innerHTML = '<span class="spinner"></span> Eliminando…';
     const r = await APP.API.call('eliminar_usuario', {usuario: usr.usuario});
-    if (!r.ok) { APP.U.toast(r.error,'error'); return; }
+    if (!r.ok) { APP.U.toast(r.error,'error'); this.disabled=false; this.innerHTML=original; return; }
     APP.U.invalidar('usuarios');
     APP.U.closeModal();
     APP.U.toast('Eliminado','warn');
@@ -130,7 +136,10 @@ function abrirFormUsuario(usr, secs){
   if (bR) bR.onclick = async function(){
     const p = prompt('Nueva contraseña (mínimo 6):');
     if (!p || p.length < 6) return;
+    const original = this.innerHTML;
+    this.disabled = true; this.innerHTML = '<span class="spinner"></span> Restableciendo…';
     const r = await APP.API.call('reset_password', {usuario: usr.usuario, password: p});
+    this.disabled = false; this.innerHTML = original;
     if (!r.ok) { APP.U.toast(r.error,'error'); return; }
     APP.U.toast('Contraseña restablecida','success');
   };
@@ -163,10 +172,12 @@ APP.Views.secciones = {
 
     document.getElementById('btn-ns').onclick = () => formSeccion(null);
     document.querySelectorAll('[data-edit]').forEach(b => b.onclick = () => formSeccion(secs.find(s=>s.codigo===b.dataset.edit)));
-    document.querySelectorAll('[data-del]').forEach(b => b.onclick = async () => {
+    document.querySelectorAll('[data-del]').forEach(b => b.onclick = async function(){
       if (!APP.U.confirmar('¿Eliminar sección '+b.dataset.del+'?')) return;
+      const original = this.innerHTML;
+      this.disabled = true; this.innerHTML = '<span class="spinner dark"></span>';
       const r = await APP.API.call('eliminar_seccion', {codigo: b.dataset.del});
-      if (!r.ok) { APP.U.toast(r.error,'error'); return; }
+      if (!r.ok) { APP.U.toast(r.error,'error'); this.disabled=false; this.innerHTML=original; return; }
       APP.U.invalidar('secciones');
       APP.U.toast('Eliminada','warn');
       APP.Router.refresh();
@@ -198,8 +209,10 @@ function formSeccion(s){
     };
     if (!isNew) data.activo = document.getElementById('s-act').value === 'true';
     if (!data.codigo || !data.nombre) { APP.U.toast('Faltan campos','error'); return; }
+    const original = this.innerHTML;
+    this.disabled = true; this.innerHTML = '<span class="spinner"></span> Guardando…';
     const r = await APP.API.call(isNew?'crear_seccion':'editar_seccion', data);
-    if (!r.ok) { APP.U.toast(r.error,'error'); return; }
+    if (!r.ok) { APP.U.toast(r.error,'error'); this.disabled=false; this.innerHTML=original; return; }
     APP.U.invalidar('secciones');
     APP.U.closeModal();
     APP.U.toast('Guardado','success');
@@ -238,16 +251,18 @@ APP.Views.config = {
           <li>Pega abajo en formato: <code class="mono">TUNUMERO:APIKEY</code> (ej: <code class="mono">50499999999:123456</code>)</li>
         </ol>
         <label>Mi teléfono WhatsApp + API key</label>
-        <input id="cfg-tel" value="${APP.U.esc(u.telefono)}" placeholder="50499999999:123456" style="width:100%;background:var(--card);border:1px solid var(--border);border-radius:9px;padding:10px 12px">
+        <input id="cfg-tel" autocomplete="off" value="${APP.U.esc(u.telefono)}" placeholder="50499999999:123456" style="width:100%;background:var(--card);border:1px solid var(--border);border-radius:9px;padding:10px 12px">
         <button class="btn" id="cfg-tel-save" style="margin-top:10px">Guardar teléfono</button>
       </div>
 
       <div class="panel">
         <h3>Cambiar contraseña</h3>
+        <form autocomplete="off" onsubmit="return false">
         <div class="row2" style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-          <div><label>Contraseña actual</label><input type="password" id="cfg-p1" style="width:100%;background:var(--card);border:1px solid var(--border);border-radius:9px;padding:10px 12px"></div>
-          <div><label>Contraseña nueva</label><input type="password" id="cfg-p2" style="width:100%;background:var(--card);border:1px solid var(--border);border-radius:9px;padding:10px 12px"></div>
+          <div><label>Contraseña actual</label><input type="password" id="cfg-p1" autocomplete="current-password" style="width:100%;background:var(--card);border:1px solid var(--border);border-radius:9px;padding:10px 12px"></div>
+          <div><label>Contraseña nueva</label><input type="password" id="cfg-p2" autocomplete="new-password" style="width:100%;background:var(--card);border:1px solid var(--border);border-radius:9px;padding:10px 12px"></div>
         </div>
+        </form>
         <button class="btn" id="cfg-pass-save" style="margin-top:14px">Cambiar contraseña</button>
       </div>
 
@@ -264,7 +279,10 @@ APP.Views.config = {
 
     document.getElementById('cfg-tel-save').onclick = async function(){
       const tel = document.getElementById('cfg-tel').value.trim();
+      const original = this.innerHTML;
+      this.disabled = true; this.innerHTML = '<span class="spinner"></span> Guardando…';
       const r = await APP.API.call('guardar_telefono', {telefono: tel});
+      this.disabled = false; this.innerHTML = original;
       if (!r.ok) { APP.U.toast(r.error,'error'); return; }
       const s = APP.Auth.session(); s.user.telefono = tel; localStorage.setItem('fa2_act_session', JSON.stringify(s));
       APP.U.toast('Teléfono guardado','success');
@@ -274,8 +292,10 @@ APP.Views.config = {
       const p1 = document.getElementById('cfg-p1').value;
       const p2 = document.getElementById('cfg-p2').value;
       if (!p1 || !p2) { APP.U.toast('Llena ambos campos','error'); return; }
+      const original = this.innerHTML;
+      this.disabled = true; this.innerHTML = '<span class="spinner"></span> Cambiando…';
       const r = await APP.API.call('cambiar_password', {password_actual:p1, password_nueva:p2});
-      if (!r.ok) { APP.U.toast(r.error,'error'); return; }
+      if (!r.ok) { APP.U.toast(r.error,'error'); this.disabled=false; this.innerHTML=original; return; }
       APP.U.toast('Contraseña cambiada, vuelve a entrar','success');
       setTimeout(()=>APP.Auth.logout(), 1500);
     };
