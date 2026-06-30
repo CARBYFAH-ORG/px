@@ -68,6 +68,7 @@ textarea { font-family: inherit; resize: vertical; }
 input, select, textarea { font-family: inherit; }
 .hidden { display: none !important; }
 .mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
+.ic-inline { width: 13px; height: 13px; vertical-align: -2px; flex: none; }
 
 /* ===== LOGIN ===== */
 #login {
@@ -373,6 +374,14 @@ input, select, textarea { font-family: inherit; }
 .banner-pendientes.azul  { background: var(--blue-soft);  border-color: var(--blue);  color: var(--blue-text); }
 .banner-pendientes b { font-weight: 700; }
 .banner-pendientes .b-item { display: flex; align-items: center; gap: 6px; }
+.banner-pendientes .b-item::before {
+  content: '';
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: .5;
+  flex: none;
+}
 .banner-pendientes .b-cerrar {
   margin-left: auto;
   background: none;
@@ -623,6 +632,11 @@ table.tbl { width: 100%; border-collapse: collapse; }
   padding-bottom: 10px;
   border-bottom: 2px solid var(--border);
 }
+.kanban-col h4 svg { width: 15px; height: 15px; flex: none; }
+.col-recibida   h4 svg { color: var(--blue); }
+.col-encurso    h4 svg { color: var(--purple); }
+.col-completada h4 svg { color: var(--amber); }
+.col-reportada  h4 svg { color: var(--green); }
 .col-recibida  h4 { border-color: var(--blue); }
 .col-encurso   h4 { border-color: var(--purple); }
 .col-completada h4 { border-color: var(--amber); }
