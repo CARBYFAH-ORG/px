@@ -9,10 +9,10 @@ APP.Views.kanban = {
     const acts = r.actividades.filter(a => ['Recibida','En curso','Completada','Reportada'].indexOf(a.estado) !== -1);
 
     const cols = [
-      {key:'Recibida',  cls:'col-recibida',  ic:'📥'},
-      {key:'En curso',  cls:'col-encurso',   ic:'⚙️'},
-      {key:'Completada',cls:'col-completada',ic:'✅'},
-      {key:'Reportada', cls:'col-reportada', ic:'📤'}
+      {key:'Recibida',  cls:'col-recibida',  ic:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>'},
+      {key:'En curso',  cls:'col-encurso',   ic:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>'},
+      {key:'Completada',cls:'col-completada',ic:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>'},
+      {key:'Reportada', cls:'col-reportada', ic:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4 20-7z"/></svg>'}
     ];
 
     let html = '';
@@ -84,7 +84,7 @@ function renderCard(a){
   else if (dif < 24 && a.estado !== 'Reportada') venceCls = 'style="color:var(--amber)"';
   return `<div class="kanban-card" data-act-id="${APP.U.esc(a.id)}">
     <div class="kt">${APP.U.esc(a.titulo)}</div>
-    <div class="kd" ${venceCls}>🕐 ${APP.U.fmtFechaHora(a.fecha_limite)}</div>
+    <div class="kd" ${venceCls}><svg class="ic-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> ${APP.U.fmtFechaHora(a.fecha_limite)}</div>
     <div class="km">
       <span>${APP.U.esc(a.asignado_a)}</span>
       <span class="badge ${a.prioridad.toLowerCase()}">${APP.U.esc(a.prioridad)}</span>
